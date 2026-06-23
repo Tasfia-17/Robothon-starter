@@ -27,7 +27,7 @@ def check(name, cond, detail=""):
 print("\n[1] Required files")
 required = [
     "README.md", "JUDGE_BRIEF.md", "INNOVATIONS.md", "registration.json",
-    "main.py", "audit.py", "metrics_report.json",
+    "run.py", "main.py", "audit.py", "metrics_report.json",
     "ablation.json", "dex_report.json", "dynamics_report.json",
     "demo.mp4", "assets/scene.xml", "assets/h1_model.xml",
 ]

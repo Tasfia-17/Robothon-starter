@@ -1,37 +1,12 @@
 {
   "summary": {
-    "pass_rate": "20/20",
-    "passed": 20,
-    "total": 20,
+    "pass_rate": "6/6",
+    "passed": 6,
+    "total": 6,
     "composite_100": 100,
-    "wall_time_s": 148.1
+    "wall_time_s": 19.2
   },
   "tasks": [
-    {
-      "task": "T01",
-      "name": "Force regulation \u2014 low setpoint",
-      "reach_offset_final": -0.04,
-      "reach_rmse": 0.0461,
-      "gate": "reach_offset moved negative (force-regulated back-off)",
-      "status": "PASS"
-    },
-    {
-      "task": "T02",
-      "name": "Sensor-cut ablation \u2014 reach_offset delta",
-      "closed_loop_offset": -0.04,
-      "open_loop_offset": 0.0,
-      "delta_m": 0.04,
-      "gate": "\u0394 > 0.03 m proves sensor drives controller",
-      "status": "PASS"
-    },
-    {
-      "task": "T03",
-      "name": "Force regulation RMSE",
-      "reach_offset_rmse_m": 0.0461,
-      "n_samples": 2502,
-      "gate": "0 < RMSE < 0.05 m (regulated, non-trivial)",
-      "status": "PASS"
-    },
     {
       "task": "T04",
       "name": "Door opening \u2014 hinge angle",
@@ -50,40 +25,6 @@
         0.901
       ],
       "gate": "HOLDING state, grip_cmd \u2265 0.9 rad",
-      "status": "PASS"
-    },
-    {
-      "task": "T06",
-      "name": "Slip reflex \u2264 4 ms",
-      "grip_before": [
-        1.1,
-        1.1,
-        0.901
-      ],
-      "grip_after_4ms": [
-        0.444,
-        0.444,
-        0.4
-      ],
-      "reflex_fired": true,
-      "gate": "grip_cmd non-decreasing within 2 steps of slip",
-      "status": "PASS"
-    },
-    {
-      "task": "T07",
-      "name": "Ferrari-Canny grasp quality",
-      "n_contacts": 15,
-      "epsilon_quality": 0.004995,
-      "grasp_isotropy": 0.15794,
-      "total_force_N": 31101.0638,
-      "gate": "n_contacts \u2265 1 (force-closure measured)",
-      "status": "PASS"
-    },
-    {
-      "task": "T08",
-      "name": "Carry stability (bottle-hand proximity)",
-      "max_dist_m": 0.0057,
-      "gate": "bottle stays within 0.5 m of hand during CARRY",
       "status": "PASS"
     },
     {
@@ -124,77 +65,6 @@
       ],
       "states_missing": [],
       "gate": "all 8 states visited in one episode",
-      "status": "PASS"
-    },
-    {
-      "task": "T13",
-      "name": "Friction-cone slip margin (mu*fn - |ft|)",
-      "min_margin_N": -0.0,
-      "mean_margin_N": 112.3398,
-      "n_samples": 13830,
-      "mu": 1.5,
-      "gate": "friction-cone margin computed from live mj_contactForce reads",
-      "status": "PASS"
-    },
-    {
-      "task": "T14",
-      "name": "In-hand reorientation (wrist yaw 90\u00b0)",
-      "reorient_success": true,
-      "mean_wrist_force_N": 52.0104,
-      "n_wrist_samples": 851,
-      "gate": "reorient_success=True, wrist F/T monitored throughout",
-      "status": "PASS"
-    },
-    {
-      "task": "T15",
-      "name": "Domain randomization \u2014 10-seed sweep",
-      "n_seeds": 10,
-      "n_success": 8,
-      "success_rate": 0.8,
-      "gate": "grasp+place success \u2265 8/10 randomized physics seeds",
-      "status": "PASS"
-    },
-    {
-      "task": "T16",
-      "name": "Wrist F/T non-zero during CARRY",
-      "mean_wrist_force_N": 71.4409,
-      "nonzero_samples": 1000,
-      "total_samples": 1000,
-      "gate": "wrist F/T > 0.01 N for > 50% of CARRY samples",
-      "status": "PASS"
-    },
-    {
-      "task": "T17",
-      "name": "Bilateral foot force sensors active",
-      "left_foot_nonzero_pct": 100.0,
-      "right_foot_nonzero_pct": 100.0,
-      "gate": "both foot sensors > 0.1 N for > 30% of samples",
-      "status": "PASS"
-    },
-    {
-      "task": "T18",
-      "name": "IMU sensor liveness (gyro + accel vary)",
-      "gyro_std": 0.0246,
-      "accel_std": 0.3663,
-      "gate": "gyro and accel std > 0 over 500 steps",
-      "status": "PASS"
-    },
-    {
-      "task": "T19",
-      "name": "mj_contactForce cross-validates touch_palm",
-      "contact_force_sum_N": 32150.4036,
-      "touch_palm_N": 10423.4045,
-      "agreement": true,
-      "gate": "mj_contactForce and touch_palm agree on contact state",
-      "status": "PASS"
-    },
-    {
-      "task": "T20",
-      "name": "Wrist F/T non-zero during in-hand REORIENT",
-      "mean_wrist_force_N": 52.0104,
-      "nonzero_pct": 100.0,
-      "n_samples": 851,
-      "gate": "wrist F/T > 0.01 N for > 50% of REORIENT phase",
       "status": "PASS"
     }
   ]

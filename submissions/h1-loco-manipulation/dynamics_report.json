@@ -14,7 +14,7 @@
     "stable": true
   },
   "geom_distance_hand_to_bottle_m": 0.2768,
-  "mj_mulM_norm": 135.1598,
+  "mj_mulM_norm": 43.655936,
   "mj_differentiatePos_norm": 0.01,
   "energy": {
     "mean_total_J": 2377.685,
