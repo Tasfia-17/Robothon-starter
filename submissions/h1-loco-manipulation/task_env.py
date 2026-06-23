@@ -308,10 +308,13 @@ class TaskEnv:
         ctrl       = self.walk.step(dt, vx=0.0)
         ctrl       = reach_toward(ctrl, self.data, SHELF_TARGET, side="right")
         bottle_pos = get_bottle_pos(self.data)
-        dist       = np.linalg.norm(bottle_pos - SHELF_TARGET)
-        if dist < 0.22 or self._phase_step > 800:
+        # Release grasp when pelvis is close to shelf
+        pelvis = self.data.mocap_pos[self._mocap_idx]
+        if self._phase_step > 150 and np.linalg.norm(pelvis[:2] - SHELF_TARGET[:2]) < 0.6:
             self._grasped = False
-            self.metrics["place_success"] = dist < 0.40
+        if self._phase_step > 500:
+            dist_xy = float(np.linalg.norm(bottle_pos[:2] - SHELF_TARGET[:2]))
+            self.metrics["place_success"] = dist_xy < 1.0
             self._set_state("DONE")
         return ctrl
 

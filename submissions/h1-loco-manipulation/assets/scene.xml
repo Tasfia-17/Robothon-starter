@@ -2,7 +2,9 @@
 
   <compiler angle="radian"/>
 
-  <option timestep="0.002" gravity="0 0 -9.81" solver="Newton" iterations="100" tolerance="1e-10"/>
+  <!-- Physics: elliptic cones, NoSlip solver, implicit damping — physics-rich contact model -->
+  <option timestep="0.002" gravity="0 0 -9.81" solver="Newton" iterations="100" tolerance="1e-10"
+          cone="elliptic" impratio="10" noslip_iterations="3" integrator="implicitfast"/>
 
   <visual>
     <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
@@ -29,7 +31,8 @@
     <light name="fill_light" pos="2 -2 3"  dir="-0.4 0.4 -0.8"  diffuse="0.3 0.3 0.4" specular="0 0 0"       castshadow="false"/>
 
     <!-- Floor -->
-    <geom name="floor" type="plane" size="5 5 0.1" material="groundplane" condim="3" friction="0.8 0.02 0.01"/>
+    <geom name="floor" type="plane" size="5 5 0.1" material="groundplane"
+          condim="4" friction="0.8 0.02 0.01" solimp="0.9 0.95 0.001" solref="0.01 1"/>
 
     <!-- Walls -->
     <geom name="wall_back"  type="box" pos="0 3 1.5"   size="4    0.05 1.5" material="wall"/>
@@ -70,9 +73,9 @@
     <!-- Bottle (free body, starts inside cabinet) -->
     <body name="bottle" pos="0 2.45 0.75">
       <freejoint name="bottle_free"/>
-      <geom name="bottle_body" type="cylinder" size="0.035 0.1"  pos="0 0 0"    material="bottle" mass="0.35" condim="4" friction="0.8 0.02 0.01"/>
-      <geom name="bottle_neck" type="cylinder" size="0.018 0.04" pos="0 0 0.14" material="bottle" mass="0.05"/>
-      <geom name="bottle_cap"  type="cylinder" size="0.022 0.01" pos="0 0 0.185" rgba="0.9 0.3 0.1 1" mass="0.02"/>
+      <geom name="bottle_body" type="cylinder" size="0.035 0.1"  pos="0 0 0"    material="bottle" mass="0.35" condim="4" friction="1.5 0.02 0.001" solimp="0.99 0.999 0.001" solref="0.005 1"/>
+      <geom name="bottle_neck" type="cylinder" size="0.018 0.04" pos="0 0 0.14" material="bottle" mass="0.05" condim="1"/>
+      <geom name="bottle_cap"  type="cylinder" size="0.022 0.01" pos="0 0 0.185" rgba="0.9 0.3 0.1 1" mass="0.02" condim="1"/>
       <site name="bottle_center" pos="0 0 0" size="0.001"/>
     </body>
 
@@ -101,15 +104,26 @@
   </equality>
 
   <sensor>
+    <!-- IMU on pelvis — orientation, angular velocity, linear acceleration -->
     <framequat   name="imu_quat"          objtype="body" objname="pelvis"/>
     <frameangvel name="imu_gyro"          objtype="body" objname="pelvis"/>
     <framelinvel name="imu_accel"         objtype="body" objname="pelvis"/>
+    <!-- Foot force sensors — 3-axis contact forces at sole sites -->
     <force       name="left_foot_force"   site="left_foot_contact"/>
     <force       name="right_foot_force"  site="right_foot_contact"/>
+    <!-- Hand Cartesian positions (framepos) — used in IK and grasp detection -->
     <framepos    name="left_hand_pos"     objtype="site" objname="left_hand_site"/>
     <framepos    name="right_hand_pos"    objtype="site" objname="right_hand_site"/>
+    <!-- Wrist 6-DOF force/torque — detects grasp load, used in reward computation -->
+    <force       name="right_wrist_force"  site="right_hand_site"/>
+    <torque      name="right_wrist_torque" site="right_hand_site"/>
+    <!-- Tactile touch sensors at right-hand fingertip proxies -->
+    <touch       name="touch_palm"        site="right_hand_site"/>
+    <!-- Actuator force sensors — monitors motor effort for energy reward -->
+    <actuatorfrc name="actuator_forces"   actuator="right_shoulder_pitch"/>
+    <!-- Object and target tracking -->
     <framepos    name="bottle_pos"        objtype="site" objname="bottle_center"/>
-    <framepos    name="shelf_target_pos"  objtype="site" objname="shelf_target"/>
+    <framepos    name="shelf_pos"         objtype="site" objname="shelf_target"/>
   </sensor>
 
 </mujoco>
