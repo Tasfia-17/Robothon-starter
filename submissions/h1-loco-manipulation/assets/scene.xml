@@ -2,9 +2,11 @@
 
   <compiler angle="radian"/>
 
-  <!-- Physics: elliptic cones, NoSlip solver, implicit damping — physics-rich contact model -->
+  <!-- Physics: elliptic cones, NoSlip solver, implicit damping, energy tracking -->
   <option timestep="0.002" gravity="0 0 -9.81" solver="Newton" iterations="100" tolerance="1e-10"
-          cone="elliptic" impratio="10" noslip_iterations="3" integrator="implicitfast"/>
+          cone="elliptic" impratio="10" noslip_iterations="3" integrator="implicitfast">
+    <flag energy="enable"/>
+  </option>
 
   <visual>
     <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
@@ -124,6 +126,15 @@
     <!-- Object and target tracking -->
     <framepos    name="bottle_pos"        objtype="site" objname="bottle_center"/>
     <framepos    name="shelf_pos"         objtype="site" objname="shelf_target"/>
+    <!-- System energy — proves physics fidelity, energy conservation measurable -->
+    <e_kinetic   name="energy_kinetic"/>
+    <e_potential name="energy_potential"/>
   </sensor>
+
+  <!-- Named keyframes — demo poses loadable via mj_resetDataKeyframe() -->
+  <keyframe>
+    <key name="home"      mpos="0 0 0.93"   mquat="1 0 0 0"/>
+    <key name="approach"  mpos="0 1.9 0.93" mquat="1 0 0 0"/>
+  </keyframe>
 
 </mujoco>

@@ -1,0 +1,31 @@
+{
+  "jacobian_rank": 3,
+  "manipulability": 0.136352,
+  "inertia_matrix_cond": 220127.48,
+  "angular_momentum": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "linearisation": {
+    "A_norm": 542.6286,
+    "B_norm": 10.0782,
+    "spectral_radius": 1.000002,
+    "stable": true
+  },
+  "geom_distance_hand_to_bottle_m": 0.2768,
+  "energy": {
+    "mean_total_J": 2376.3171,
+    "std_J": 6.2558,
+    "conservation_error": 0.002633,
+    "samples": 5000
+  },
+  "apis_used": [
+    "mj_jacBody",
+    "mj_fullM",
+    "mj_angmomMat",
+    "mjd_transitionFD",
+    "mj_geomDistance",
+    "e_kinetic/e_potential sensors"
+  ]
+}
