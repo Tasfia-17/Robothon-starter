@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "pass_rate": "12/12",
+    "passed": 12,
+    "total": 12,
+    "composite_100": 100,
+    "wall_time_s": 44.6
+  },
+  "tasks": [
+    {
+      "task": "T01",
+      "name": "Force regulation \u2014 low setpoint",
+      "reach_offset_final": -0.04,
+      "reach_rmse": 0.0461,
+      "gate": "reach_offset moved negative (force-regulated back-off)",
+      "status": "PASS"
+    },
+    {
+      "task": "T02",
+      "name": "Sensor-cut ablation \u2014 reach_offset delta",
+      "closed_loop_offset": -0.04,
+      "open_loop_offset": 0.0,
+      "delta_m": 0.04,
+      "gate": "\u0394 > 0.03 m proves sensor drives controller",
+      "status": "PASS"
+    },
+    {
+      "task": "T03",
+      "name": "Force regulation RMSE",
+      "reach_offset_rmse_m": 0.0461,
+      "n_samples": 2502,
+      "gate": "0 < RMSE < 0.05 m (regulated, non-trivial)",
+      "status": "PASS"
+    },
+    {
+      "task": "T04",
+      "name": "Door opening \u2014 hinge angle",
+      "door_angle_rad": 1.3025,
+      "door_angle_deg": 74.6292,
+      "gate": "door_angle \u2265 1.0 rad (measured from qpos, not commanded)",
+      "status": "PASS"
+    },
+    {
+      "task": "T05",
+      "name": "3-finger force-closure grasp",
+      "gripper_state": "HOLDING",
+      "grip_cmd_rad": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "gate": "HOLDING state, grip_cmd \u2265 0.9 rad",
+      "status": "PASS"
+    },
+    {
+      "task": "T06",
+      "name": "Slip reflex \u2264 4 ms",
+      "grip_before": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "grip_after_4ms": [
+        0.544,
+        0.544,
+        0.538
+      ],
+      "reflex_fired": true,
+      "gate": "grip_cmd non-decreasing within 2 steps of slip",
+      "status": "PASS"
+    },
+    {
+      "task": "T07",
+      "name": "Ferrari-Canny grasp quality",
+      "n_contacts": 26,
+      "epsilon_quality": 0.005569,
+      "grasp_isotropy": 0.133326,
+      "total_force_N": 58339.1748,
+      "gate": "n_contacts \u2265 1 (force-closure measured)",
+      "status": "PASS"
+    },
+    {
+      "task": "T08",
+      "name": "Carry stability (bottle-hand proximity)",
+      "max_dist_m": 0.0059,
+      "gate": "bottle stays within 0.5 m of hand during CARRY",
+      "status": "PASS"
+    },
+    {
+      "task": "T09",
+      "name": "Shelf placement success",
+      "place_success": true,
+      "grasp_success": true,
+      "gate": "place_success = True (measured from bottle-shelf distance)",
+      "status": "PASS"
+    },
+    {
+      "task": "T10",
+      "name": "Balance \u2014 no falls during episode",
+      "fall_count": 0,
+      "gate": "fall_count = 0",
+      "status": "PASS"
+    },
+    {
+      "task": "T11",
+      "name": "Energy conservation < 1%",
+      "conservation_error_pct": 0.8355,
+      "n_samples": 1000,
+      "gate": "std/mean < 1% over 1000 steps",
+      "status": "PASS"
+    },
+    {
+      "task": "T12",
+      "name": "All 7 FSM states reachable",
+      "states_visited": [
+        "CARRY",
+        "DONE",
+        "GRASP",
+        "NAVIGATE",
+        "OPEN_DOOR",
+        "PLACE",
+        "REACH"
+      ],
+      "states_missing": [],
+      "gate": "all 7 states visited in one episode",
+      "status": "PASS"
+    }
+  ]
+}

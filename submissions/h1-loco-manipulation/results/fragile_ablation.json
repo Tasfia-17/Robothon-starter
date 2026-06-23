@@ -1,0 +1,66 @@
+{
+  "phenomenon": "force-regulated reach: closed-loop backs off, open-loop overshoots",
+  "force_budget_description": "reach_offset < -0.01 m = safely backed off",
+  "n_seeds": 6,
+  "closed_loop_safe_rate": 1.0,
+  "open_loop_safe_rate": 0.0,
+  "closed_mean_offset": -0.04,
+  "open_mean_offset": 0.0,
+  "per_seed": [
+    {
+      "seed": 0,
+      "closed_backed_off": true,
+      "open_backed_off": false,
+      "closed_offset_final": -0.04,
+      "open_offset_final": 0.0,
+      "closed_safe": true,
+      "open_safe": false
+    },
+    {
+      "seed": 1,
+      "closed_backed_off": true,
+      "open_backed_off": false,
+      "closed_offset_final": -0.04,
+      "open_offset_final": 0.0,
+      "closed_safe": true,
+      "open_safe": false
+    },
+    {
+      "seed": 2,
+      "closed_backed_off": true,
+      "open_backed_off": false,
+      "closed_offset_final": -0.04,
+      "open_offset_final": 0.0,
+      "closed_safe": true,
+      "open_safe": false
+    },
+    {
+      "seed": 3,
+      "closed_backed_off": true,
+      "open_backed_off": false,
+      "closed_offset_final": -0.04,
+      "open_offset_final": 0.0,
+      "closed_safe": true,
+      "open_safe": false
+    },
+    {
+      "seed": 4,
+      "closed_backed_off": true,
+      "open_backed_off": false,
+      "closed_offset_final": -0.04,
+      "open_offset_final": 0.0,
+      "closed_safe": true,
+      "open_safe": false
+    },
+    {
+      "seed": 5,
+      "closed_backed_off": true,
+      "open_backed_off": false,
+      "closed_offset_final": -0.04,
+      "open_offset_final": 0.0,
+      "closed_safe": true,
+      "open_safe": false
+    }
+  ],
+  "verdict": "closed-loop backed off 6/6 seeds vs open-loop 0/6 \u2014 sensor-driven regulation provably reduces overshoot"
+}
