@@ -1,23 +1,23 @@
 {
   "jacobian_rank": 3,
-  "manipulability": 0.136352,
-  "inertia_matrix_cond": 220127.48,
+  "manipulability": 0.113422,
+  "inertia_matrix_cond": 220538.46,
   "angular_momentum": [
     0.0,
     0.0,
     0.0
   ],
   "linearisation": {
-    "A_norm": 542.6286,
-    "B_norm": 10.0782,
-    "spectral_radius": 1.000002,
+    "A_norm": 542.8541,
+    "B_norm": 10.0595,
+    "spectral_radius": 1.000117,
     "stable": true
   },
   "geom_distance_hand_to_bottle_m": 0.2768,
   "energy": {
-    "mean_total_J": 2376.3171,
-    "std_J": 6.2558,
-    "conservation_error": 0.002633,
+    "mean_total_J": 2377.685,
+    "std_J": 6.3997,
+    "conservation_error": 0.002692,
     "samples": 5000
   },
   "apis_used": [

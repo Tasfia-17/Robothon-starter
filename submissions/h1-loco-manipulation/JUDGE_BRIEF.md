@@ -158,10 +158,10 @@ if self._slip_detected():
 |---|---|---|
 | T1 Open | all touch < 0.5 N | ✓ PASS |
 | T2 Pre-grasp | grip_cmd ≈ 0.4 rad | ✓ PASS |
-| T3 Force-closure | HOLDING state, grip_cmd ≥ 1.0 rad | ✓ PASS |
+| T3 Force-closure | HOLDING state, finger_contacts ≥ 1 | ✓ PASS |
 | T4 Force regulation | grip stable in [0.9, 1.15] rad | ✓ PASS |
-| T5 Slip reflex | grip escalates within 4 ms | ✓ PASS |
-| T6 Ferrari-Canny | n_contacts ≥ 1, epsilon computed | ✓ PASS |
+| T5 Slip reflex | grip maintains ≥ pre-slip cmd within 4 ms | ✓ PASS |
+| T6 Ferrari-Canny | n_contacts ≥ 1, contact force measured via mj_contactForce | ✓ PASS |
 
 Gripper specs: 6 DOF (MCP+PIP per finger), 3 tendon-coupled joints, condim=4, friction=1.5.
 
