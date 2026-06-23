@@ -1,9 +1,12 @@
 """
-task_env.py — FSM task environment using mocap-driven pelvis locomotion.
+task_env.py — FSM task environment with CLOSED-LOOP force/contact sensing.
 
-The pelvis is welded to pelvis_mocap body (data.mocap_pos[0]).
-Navigation moves the mocap body toward waypoints.
-Arm manipulation uses analytical IK (see arm_control.py).
+Closed-loop architecture:
+  - Foot force sensors (left_foot_force, right_foot_force) regulate balance gain.
+  - Bottle contact force measured from MuJoCo contact array during grasp.
+  - Grasp force setpoint = 2.5 N; controller regulates reach speed to stay in window.
+  - If contact force > GRASP_FORCE_MAX → back off; < GRASP_FORCE_MIN → advance.
+  - Balance gain scales with total foot load (lighter step → more correction).
 
 States: NAVIGATE → OPEN_DOOR → REACH → GRASP → CARRY → PLACE → DONE
 """
@@ -55,6 +58,16 @@ class TaskEnv:
         mocap_bid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "pelvis_mocap")
         self._mocap_idx = int(model.body_mocapid[mocap_bid])
 
+        # Sensor indices for closed-loop force control
+        def _sid(name):
+            i = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, name)
+            return int(model.sensor_adr[i]) if i >= 0 else None
+        self._lfoot_adr = _sid("left_foot_force")
+        self._rfoot_adr = _sid("right_foot_force")
+
+        # Bottle geom id for contact force measurement
+        self._bottle_geom_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "bottle_body")
+
         self.reset()
 
     # ── Public API ────────────────────────────────────────────────────────
@@ -80,12 +93,17 @@ class TaskEnv:
         self._grasped     = False
         self._last_pz     = PELVIS_STAND_Z
         self._cur_yaw     = 0.0
+        # Closed-loop force tracking
+        self._contact_force   = 0.0   # N, live bottle contact force
+        self._reach_offset    = 0.0   # adaptive reach delta from force regulator
         self.metrics = {
-            "start_time":     time.time(),
-            "door_max_angle": 0.0,
-            "grasp_success":  False,
-            "place_success":  False,
-            "fall_count":     0,
+            "start_time":        time.time(),
+            "door_max_angle":    0.0,
+            "grasp_success":     False,
+            "place_success":     False,
+            "fall_count":        0,
+            "peak_contact_force": 0.0,
+            "foot_force_samples": [],
         }
         self.walk.reset()
         self._set_state("NAVIGATE")
@@ -93,10 +111,50 @@ class TaskEnv:
     def step(self, dt: float) -> np.ndarray:
         """Advance FSM, move mocap, return ctrl array."""
         self._phase_step += 1
+        self._read_sensors()
         ctrl = self._fsm_ctrl(dt)
-        ctrl = self.bal.correct(ctrl, get_pelvis_euler(self.data))
+        # Closed-loop balance: scale correction by foot load
+        foot_load = max(self._foot_force_total(), 10.0)
+        gain_scale = np.clip(200.0 / foot_load, 0.5, 2.0)
+        ctrl = self.bal.correct(ctrl, get_pelvis_euler(self.data), gain_scale)
         self._check_fall()
         return ctrl
+
+    def _read_sensors(self):
+        """Read force sensors from sensordata — live closed-loop feedback."""
+        s = self.data.sensordata
+        # Foot forces (3-axis each)
+        if self._lfoot_adr is not None:
+            lf = np.linalg.norm(s[self._lfoot_adr:self._lfoot_adr+3])
+            rf = np.linalg.norm(s[self._rfoot_adr:self._rfoot_adr+3])
+            total = float(lf + rf)
+            self.metrics["foot_force_samples"].append(total)
+        # Bottle contact force from MuJoCo contact array
+        self._contact_force = self._measure_bottle_contact()
+        if self._contact_force > self.metrics["peak_contact_force"]:
+            self.metrics["peak_contact_force"] = self._contact_force
+
+    def _foot_force_total(self) -> float:
+        """Sum of left+right foot normal forces from sensordata."""
+        s = self.data.sensordata
+        if self._lfoot_adr is None:
+            return 100.0
+        lf = np.linalg.norm(s[self._lfoot_adr:self._lfoot_adr+3])
+        rf = np.linalg.norm(s[self._rfoot_adr:self._rfoot_adr+3])
+        return float(lf + rf)
+
+    def _measure_bottle_contact(self) -> float:
+        """Return total contact force magnitude on bottle geom from live contact array."""
+        total = 0.0
+        for i in range(self.data.ncon):
+            c = self.data.contact[i]
+            if c.geom1 == self._bottle_geom_id or c.geom2 == self._bottle_geom_id:
+                # contact.frame[0:3] is normal; force from efc_force
+                # Use mj_contactForce for accurate 6-DOF force
+                f = np.zeros(6)
+                mujoco.mj_contactForce(self.model, self.data, i, f)
+                total += float(np.linalg.norm(f[:3]))
+        return total
 
     def apply_grasp_kinematics(self):
         """Track bottle position to right hand site while grasped."""
@@ -190,7 +248,15 @@ class TaskEnv:
     def _reach(self, dt: float) -> np.ndarray:
         ctrl       = self.walk.step(dt, vx=0.0)
         bottle_pos = get_bottle_pos(self.data)
-        ctrl       = reach_toward(ctrl, self.data, bottle_pos, side="right")
+        # Closed-loop: back off if contact force > 3N, advance if < 1N
+        FORCE_MIN, FORCE_MAX = 1.0, 3.0
+        if self._contact_force > FORCE_MAX:
+            self._reach_offset = max(self._reach_offset - 0.002, -0.05)
+        elif self._contact_force < FORCE_MIN:
+            self._reach_offset = min(self._reach_offset + 0.001,  0.0)
+        target = bottle_pos.copy()
+        target[1] += self._reach_offset
+        ctrl = reach_toward(ctrl, self.data, target, side="right")
         if is_near_target(self.data, bottle_pos) or self._phase_step > 1500:
             self._set_state("GRASP")
         return ctrl
@@ -198,7 +264,15 @@ class TaskEnv:
     def _grasp(self, dt: float) -> np.ndarray:
         ctrl       = self.walk.step(dt, vx=0.0)
         bottle_pos = get_bottle_pos(self.data)
-        ctrl       = reach_toward(ctrl, self.data, bottle_pos, side="right")
+        # Closed-loop force regulation during grasp: target 2.5 N
+        FORCE_SETPOINT = 2.5
+        if self._contact_force > FORCE_SETPOINT + 0.5:
+            self._reach_offset = max(self._reach_offset - 0.001, -0.04)
+        elif self._contact_force < FORCE_SETPOINT - 0.5:
+            self._reach_offset = min(self._reach_offset + 0.001,  0.0)
+        target = bottle_pos.copy()
+        target[1] += self._reach_offset
+        ctrl = reach_toward(ctrl, self.data, target, side="right")
         if is_near_target(self.data, bottle_pos):
             self._grasp_count += 1
         else:
@@ -206,6 +280,7 @@ class TaskEnv:
         if self._grasp_count >= GRASP_HOLD_STEPS or self._phase_step > 1000:
             self._grasped = True
             self.metrics["grasp_success"] = True
+            self.metrics["grasp_force_N"] = round(self._contact_force, 3)
             self._set_state("CARRY")
         return ctrl
 

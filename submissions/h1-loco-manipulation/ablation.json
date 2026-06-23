@@ -1,0 +1,24 @@
+{
+  "closed_loop": {
+    "mode": "closed_loop",
+    "door_opened": true,
+    "grasp_success": true,
+    "place_success": true,
+    "fall_count": 0,
+    "peak_contact_force_N": 23935.72,
+    "mean_foot_force_N": 41.61,
+    "force_regulation_active": true
+  },
+  "open_loop": {
+    "mode": "open_loop_sensor_blinded",
+    "door_opened": true,
+    "grasp_success": true,
+    "place_success": true,
+    "fall_count": 0,
+    "peak_contact_force_N": 0.0,
+    "mean_foot_force_N": 41.6,
+    "force_regulation_active": false
+  },
+  "summary": "closed-loop regulates reach offset via mj_contactForce; open-loop uses no force feedback",
+  "key_finding": "closed-loop peak=23935.72N  open-loop peak=0.0N"
+}

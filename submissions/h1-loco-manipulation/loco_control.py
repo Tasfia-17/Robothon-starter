@@ -92,12 +92,13 @@ class BalanceController:
         self.kp_pitch = kp_pitch
         self.kp_roll  = kp_roll
 
-    def correct(self, ctrl: np.ndarray, euler: np.ndarray) -> np.ndarray:
+    def correct(self, ctrl: np.ndarray, euler: np.ndarray,
+                gain_scale: float = 1.0) -> np.ndarray:
         roll, pitch, _ = euler
-        ankle = -self.kp_pitch * pitch
+        ankle = -self.kp_pitch * pitch * gain_scale
         ctrl[ACTUATOR["left_ankle_pitch"]]  += ankle
         ctrl[ACTUATOR["right_ankle_pitch"]] += ankle
-        hr = -self.kp_roll * roll
+        hr = -self.kp_roll * roll * gain_scale
         ctrl[ACTUATOR["left_hip_roll"]]  += hr
         ctrl[ACTUATOR["right_hip_roll"]] -= hr
         return ctrl
