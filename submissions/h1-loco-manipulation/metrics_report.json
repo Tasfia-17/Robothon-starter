@@ -22,8 +22,8 @@
       "grasp_success": true,
       "place_success": true,
       "fall_count": 0,
-      "peak_contact_N": 42323.48,
-      "mean_foot_N": 55.2,
+      "peak_contact_N": 78677.85,
+      "mean_foot_N": 55.29,
       "steps": 9574,
       "sim_time_s": 19.15
     },
@@ -33,8 +33,8 @@
       "grasp_success": true,
       "place_success": true,
       "fall_count": 0,
-      "peak_contact_N": 42323.48,
-      "mean_foot_N": 55.2,
+      "peak_contact_N": 78677.85,
+      "mean_foot_N": 55.29,
       "steps": 9574,
       "sim_time_s": 19.15
     },
@@ -44,8 +44,8 @@
       "grasp_success": true,
       "place_success": true,
       "fall_count": 0,
-      "peak_contact_N": 42323.48,
-      "mean_foot_N": 55.2,
+      "peak_contact_N": 78677.85,
+      "mean_foot_N": 55.29,
       "steps": 9574,
       "sim_time_s": 19.15
     }

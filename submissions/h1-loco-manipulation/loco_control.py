@@ -26,9 +26,10 @@ ACTUATOR = {
     "right_shoulder_pitch": 17, "right_shoulder_roll": 18,
     "right_shoulder_yaw": 19,   "right_elbow": 20,
 }
-N_ACT = 21
+N_ACT = 24   # 21 body joints + 3 finger actuators (f1_flex, f2_flex, th_flex)
+N_BODY_ACT = 21
+N_BODY_ACT = 21
 
-# Standing joint targets (mild knee bend for natural look)
 STAND_POSE = np.zeros(N_ACT)
 STAND_POSE[ACTUATOR["left_hip_pitch"]]    = -0.15
 STAND_POSE[ACTUATOR["left_knee"]]         =  0.30

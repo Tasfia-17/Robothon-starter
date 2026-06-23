@@ -1,0 +1,88 @@
+{
+  "pass_rate": "6/6",
+  "passed": 6,
+  "total": 6,
+  "gripper_dof": 6,
+  "tendons": 3,
+  "touch_sensors": 3,
+  "tasks": {
+    "T1_open": {
+      "status": "PASS",
+      "touch_forces_N": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gate": "all touch < 0.5 N"
+    },
+    "T2_pregrasp": {
+      "status": "PASS",
+      "grip_cmd_rad": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "touch_forces_N": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gate": "grip_cmd \u2248 0.4 rad, no contact"
+    },
+    "T3_force_closure": {
+      "status": "PASS",
+      "grip_cmd_rad": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "gripper_state": "HOLDING",
+      "finger_contacts": 5,
+      "touch_forces_N": [
+        0.0,
+        0.0,
+        249.64831969819437
+      ],
+      "gate": "gripper in HOLDING state, grip_cmd \u2265 1.0 rad"
+    },
+    "T4_force_regulation": {
+      "status": "PASS",
+      "grip_cmd_rad": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "touch_forces_N": [
+        0.0,
+        0.0,
+        248.79397279830022
+      ],
+      "gripper_state": "HOLDING",
+      "gate": "HOLDING state, grip_cmd in [0.9, 1.15] rad (regulated)"
+    },
+    "T5_slip_reflex": {
+      "status": "PASS",
+      "slip_events_total": 806,
+      "grip_before": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "grip_after_reflex": [
+        0.23912499999999998,
+        0.23912499999999998,
+        0.548
+      ],
+      "gate": "grip cmd non-decreasing after slip (reflex active)"
+    },
+    "T6_grasp_quality": {
+      "status": "PASS",
+      "epsilon_quality": 0.0,
+      "grasp_isotropy": 0.251683,
+      "n_contacts": 2,
+      "total_force_N": 8236.0124,
+      "force_closure": false,
+      "gate": "n_contacts >= 1, epsilon computed"
+    }
+  }
+}

@@ -21,6 +21,7 @@ from loco_control import (WalkingController, BalanceController,
 from arm_control import (reach_toward, retract_arm, get_hand_pos,
                           get_bottle_pos, is_near_target,
                           _BOTTLE_POS_ADR, _BOTTLE_QVEL_ADR)
+from dex_grasp import DexGraspController
 
 # World-frame waypoints (matching scene.xml geometry)
 CABINET_POS  = np.array([ 0.0,  2.5,  0.0])
@@ -44,6 +45,7 @@ class TaskEnv:
         self.data  = data
         self.walk  = WalkingController()
         self.bal   = BalanceController()
+        self.gripper = DexGraspController(model, data)
 
         def _qadr(name):
             jid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, name)
@@ -264,7 +266,6 @@ class TaskEnv:
     def _grasp(self, dt: float) -> np.ndarray:
         ctrl       = self.walk.step(dt, vx=0.0)
         bottle_pos = get_bottle_pos(self.data)
-        # Closed-loop force regulation during grasp: target 2.5 N
         FORCE_SETPOINT = 2.5
         if self._contact_force > FORCE_SETPOINT + 0.5:
             self._reach_offset = max(self._reach_offset - 0.001, -0.04)
@@ -273,6 +274,14 @@ class TaskEnv:
         target = bottle_pos.copy()
         target[1] += self._reach_offset
         ctrl = reach_toward(ctrl, self.data, target, side="right")
+
+        # Activate dexterous gripper: pregrasp then close
+        if self._phase_step == 50:
+            self.gripper.pregrasp()
+        elif self._phase_step == 200:
+            self.gripper.close()
+        ctrl = self.gripper.step(ctrl)
+
         if is_near_target(self.data, bottle_pos):
             self._grasp_count += 1
         else:
@@ -281,6 +290,8 @@ class TaskEnv:
             self._grasped = True
             self.metrics["grasp_success"] = True
             self.metrics["grasp_force_N"] = round(self._contact_force, 3)
+            self.metrics["finger_touch"]  = self.gripper.touch_forces.tolist()
+            self.metrics["slip_events"]   = self.gripper.slip_events
             self._set_state("CARRY")
         return ctrl
 

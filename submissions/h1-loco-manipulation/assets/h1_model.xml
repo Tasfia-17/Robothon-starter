@@ -105,6 +105,57 @@
                 <site name="right_hand_site" pos="0 -0.26 0" size="0.04" rgba="1 0 0 0.3"/>
                 <geom name="right_hand" type="sphere" size="0.04" pos="0 -0.27 0"
                       mass="0.3" rgba="0.6 0.5 0.4 1" condim="4" friction="1.5 0.02 0.01"/>
+
+                <!-- ── 3-finger dexterous gripper at wrist ── -->
+                <body name="gripper_base" pos="0 -0.28 0">
+                  <geom type="box" size="0.022 0.012 0.018" rgba="0.4 0.4 0.4 1" mass="0.08" condim="1"/>
+
+                  <!-- Finger 1 (index) -->
+                  <body name="f1_prox" pos="0 -0.013 0.018">
+                    <joint name="f1_mcp" type="hinge" axis="1 0 0" range="-0.1 1.4"
+                           damping="0.05" armature="0.001" frictionloss="0.005"/>
+                    <geom type="capsule" fromto="0 0 0  0 -0.025 0" size="0.006"
+                          rgba="0.7 0.5 0.3 1" condim="4" friction="1.5 0.005 0.0001"/>
+                    <body name="f1_dist" pos="0 -0.025 0">
+                      <joint name="f1_pip" type="hinge" axis="1 0 0" range="0 1.2"
+                             damping="0.03" armature="0.001"/>
+                      <geom type="capsule" fromto="0 0 0  0 -0.022 0" size="0.005"
+                            rgba="0.7 0.5 0.3 1" condim="4" friction="1.5 0.005 0.0001"/>
+                      <site name="tip_f1" pos="0 -0.024 0" size="0.005"/>
+                    </body>
+                  </body>
+
+                  <!-- Finger 2 (middle) -->
+                  <body name="f2_prox" pos="0 -0.013 0">
+                    <joint name="f2_mcp" type="hinge" axis="1 0 0" range="-0.1 1.4"
+                           damping="0.05" armature="0.001" frictionloss="0.005"/>
+                    <geom type="capsule" fromto="0 0 0  0 -0.027 0" size="0.007"
+                          rgba="0.7 0.5 0.3 1" condim="4" friction="1.5 0.005 0.0001"/>
+                    <body name="f2_dist" pos="0 -0.027 0">
+                      <joint name="f2_pip" type="hinge" axis="1 0 0" range="0 1.2"
+                             damping="0.03" armature="0.001"/>
+                      <geom type="capsule" fromto="0 0 0  0 -0.024 0" size="0.006"
+                            rgba="0.7 0.5 0.3 1" condim="4" friction="1.5 0.005 0.0001"/>
+                      <site name="tip_f2" pos="0 -0.026 0" size="0.006"/>
+                    </body>
+                  </body>
+
+                  <!-- Thumb (opposing) -->
+                  <body name="thumb_prox" pos="0 -0.013 -0.018" euler="0 0 3.1416">
+                    <joint name="th_mcp" type="hinge" axis="1 0 0" range="-0.1 1.3"
+                           damping="0.05" armature="0.001" frictionloss="0.005"/>
+                    <geom type="capsule" fromto="0 0 0  0 -0.022 0" size="0.007"
+                          rgba="0.8 0.55 0.3 1" condim="4" friction="1.5 0.005 0.0001"/>
+                    <body name="thumb_dist" pos="0 -0.022 0">
+                      <joint name="th_ip" type="hinge" axis="1 0 0" range="0 1.1"
+                             damping="0.03" armature="0.001"/>
+                      <geom type="capsule" fromto="0 0 0  0 -0.018 0" size="0.006"
+                            rgba="0.8 0.55 0.3 1" condim="4" friction="1.5 0.005 0.0001"/>
+                      <site name="tip_th" pos="0 -0.020 0" size="0.006"/>
+                    </body>
+                  </body>
+                </body>
+                <!-- ── end gripper ── -->
               </body>
             </body>
           </body>
@@ -222,6 +273,37 @@
     <position name="right_shoulder_roll"  joint="right_shoulder_roll"  kp="150"  kv="15"  forcerange="-150  150"/>
     <position name="right_shoulder_yaw"   joint="right_shoulder_yaw"   kp="80"   kv="8"   forcerange="-80    80"/>
     <position name="right_elbow"          joint="right_elbow"          kp="100"  kv="10"  forcerange="-100  100"/>
+    <!-- 3-finger dexterous gripper — 6 DOF (MCP+PIP per finger, thumb MCP+IP) -->
+    <!-- Tendon-coupled: PIP = 0.7 × MCP (underactuated, like real tendon-driven hand) -->
+    <position name="f1_flex" joint="f1_mcp" kp="3" kv="0.3" forcerange="-3 3" ctrlrange="-0.1 1.4"/>
+    <position name="f2_flex" joint="f2_mcp" kp="3" kv="0.3" forcerange="-3 3" ctrlrange="-0.1 1.4"/>
+    <position name="th_flex" joint="th_mcp" kp="4" kv="0.4" forcerange="-4 4" ctrlrange="-0.1 1.3"/>
   </actuator>
+
+  <!-- Tendon coupling: PIP joints follow MCP (underactuated tendon-driven finger) -->
+  <tendon>
+    <fixed name="f1_couple">
+      <joint joint="f1_mcp" coef="1.0"/>
+      <joint joint="f1_pip" coef="-0.7"/>
+    </fixed>
+    <fixed name="f2_couple">
+      <joint joint="f2_mcp" coef="1.0"/>
+      <joint joint="f2_pip" coef="-0.7"/>
+    </fixed>
+    <fixed name="th_couple">
+      <joint joint="th_mcp" coef="1.0"/>
+      <joint joint="th_ip"  coef="-0.6"/>
+    </fixed>
+  </tendon>
+
+  <!-- Fingertip touch sensors + tip positions -->
+  <sensor>
+    <touch    name="touch_f1"    site="tip_f1"/>
+    <touch    name="touch_f2"    site="tip_f2"/>
+    <touch    name="touch_th"    site="tip_th"/>
+    <framepos name="pos_f1_tip"  objtype="site" objname="tip_f1"/>
+    <framepos name="pos_f2_tip"  objtype="site" objname="tip_f2"/>
+    <framepos name="pos_th_tip"  objtype="site" objname="tip_th"/>
+  </sensor>
 
 </mujoco>
