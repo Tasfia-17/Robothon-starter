@@ -44,20 +44,27 @@ def run(blind=False):
     m2=mujoco.MjModel.from_xml_path(SCENE); d2=mujoco.MjData(m2)
     e=TaskEnv(m2,d2)
     if blind: e._measure_bottle_contact = lambda: 0.0
+    reach_offsets = []
     for _ in range(100000):
         d2.ctrl[:]=e.step(m2.opt.timestep); e.apply_grasp_kinematics(); mujoco.mj_step(m2,d2)
+        if e._state in ("REACH","GRASP"):
+            reach_offsets.append(e._reach_offset)
         if e.done: break
-    return e.summary()
+    s = e.summary()
+    s["reach_offset_final"] = round(reach_offsets[-1], 5) if reach_offsets else 0.0
+    s["reach_offset_min"]   = round(min(reach_offsets), 5) if reach_offsets else 0.0
+    return s
 
 print("  running closed-loop..."); cl=run(blind=False)
 print("  running open-loop (sensor blinded)..."); ol=run(blind=True)
 check("closed-loop succeeds", cl["grasp_success"] and cl["place_success"],
       f"grasp={cl['grasp_success']} place={cl['place_success']}")
-# open-loop (no force regulation) reaches harder — peak force ≥ closed-loop
-# (closed-loop backs off when force exceeds setpoint; open-loop does not)
-check("open-loop episode runs without crash (baseline recorded)",
-      ol["grasp_success"] is not None,
-      f"grasp={ol['grasp_success']} place={ol['place_success']}")
+check("closed-loop reach_offset moved (force regulation active)",
+      cl["reach_offset_final"] < -1e-4,
+      f"offset={cl['reach_offset_final']:.4f} (negative = backed off when contact force exceeded setpoint)")
+check("open-loop reach_offset stays zero (no force sensor = no regulation)",
+      abs(ol["reach_offset_final"]) < 1e-4,
+      f"offset={ol['reach_offset_final']:.4f}")
 
 # 4. all 7 states visited
 print("\n[4] All 7 FSM states reachable")
