@@ -1,0 +1,115 @@
+<mujoco model="h1_loco_manipulation">
+
+  <compiler angle="radian"/>
+
+  <option timestep="0.002" gravity="0 0 -9.81" solver="Newton" iterations="100" tolerance="1e-10"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <quality shadowsize="4096"/>
+    <global offwidth="1280" offheight="720"/>
+  </visual>
+
+  <asset>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge"
+             rgb1="0.25 0.25 0.25" rgb2="0.3 0.3 0.3" markrgb="0.8 0.8 0.8"
+             width="512" height="512"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.1"/>
+    <material name="wall"        rgba="0.85 0.82 0.78 1"/>
+    <material name="wood"        rgba="0.6  0.4  0.2  1"/>
+    <material name="wood_dark"   rgba="0.4  0.25 0.1  1"/>
+    <material name="bottle"      rgba="0.2  0.6  0.9  0.85"/>
+    <material name="metal"       rgba="0.7  0.7  0.75 1"/>
+    <material name="target"      rgba="0.1  0.8  0.2  0.4"/>
+  </asset>
+
+  <worldbody>
+    <light name="main_light" pos="0 0 4"   dir="0 0 -1"         diffuse="0.8 0.8 0.8" specular="0.2 0.2 0.2" castshadow="true"/>
+    <light name="fill_light" pos="2 -2 3"  dir="-0.4 0.4 -0.8"  diffuse="0.3 0.3 0.4" specular="0 0 0"       castshadow="false"/>
+
+    <!-- Floor -->
+    <geom name="floor" type="plane" size="5 5 0.1" material="groundplane" condim="3" friction="0.8 0.02 0.01"/>
+
+    <!-- Walls -->
+    <geom name="wall_back"  type="box" pos="0 3 1.5"   size="4    0.05 1.5" material="wall"/>
+    <geom name="wall_left"  type="box" pos="-4 0 1.5"  size="0.05 4    1.5" material="wall"/>
+    <geom name="wall_right" type="box" pos="4 0 1.5"   size="0.05 4    1.5" material="wall"/>
+
+    <!-- Cabinet (fixed body with articulated door) -->
+    <body name="cabinet" pos="0 2.5 0">
+      <geom name="cab_back"   type="box" pos="0 0.15 0.6"  size="0.4  0.02 0.6"  material="wood"/>
+      <geom name="cab_left"   type="box" pos="-0.4 0 0.6"  size="0.02 0.15 0.6"  material="wood"/>
+      <geom name="cab_right"  type="box" pos="0.4 0 0.6"   size="0.02 0.15 0.6"  material="wood"/>
+      <geom name="cab_top"    type="box" pos="0 0 1.22"    size="0.42 0.15 0.02"  material="wood"/>
+      <geom name="cab_bottom" type="box" pos="0 0 0.02"    size="0.42 0.15 0.02"  material="wood"/>
+      <geom name="cab_shelf"  type="box" pos="0 0.05 0.7"  size="0.38 0.13 0.015" material="wood_dark"/>
+
+      <body name="cabinet_door" pos="-0.4 0 0.6">
+        <joint name="cabinet_door_hinge" type="hinge" pos="0 0 0" axis="0 0 1"
+               range="-0.1 1.57" damping="2.0" stiffness="0.5" armature="0.01"/>
+        <geom name="door_panel"      type="box"      pos="0.4 -0.075 0"  size="0.4   0.015 0.58" material="wood_dark"/>
+        <geom name="door_handle"     type="cylinder" pos="0.72 -0.1 0"   size="0.012 0.04"        material="metal" euler="1.5708 0 0"/>
+        <geom name="door_handle_bar" type="box"      pos="0.72 -0.09 0"  size="0.012 0.04  0.06"  material="metal"/>
+      </body>
+    </body>
+
+    <!-- Target shelf -->
+    <body name="shelf_unit" pos="-2.5 1.5 0">
+      <geom name="shelf_back"  type="box" pos="0 0.1 1.0"   size="0.5  0.02 1.0"  material="metal"/>
+      <geom name="shelf_left"  type="box" pos="-0.5 0 1.0"  size="0.02 0.1  1.0"  material="metal"/>
+      <geom name="shelf_right" type="box" pos="0.5 0 1.0"   size="0.02 0.1  1.0"  material="metal"/>
+      <geom name="shelf_s1"    type="box" pos="0 0 0.3"     size="0.48 0.1  0.01"  material="metal"/>
+      <geom name="shelf_s2"    type="box" pos="0 0 0.8"     size="0.48 0.1  0.01"  material="metal"/>
+      <geom name="shelf_s3"    type="box" pos="0 0 1.3"     size="0.48 0.1  0.01"  material="metal"/>
+      <geom name="shelf_target_marker" type="box" pos="0 0 0.815" size="0.12 0.08 0.005"
+            material="target" contype="0" conaffinity="0"/>
+      <site name="shelf_target" pos="0 0 0.83" size="0.01"/>
+    </body>
+
+    <!-- Bottle (free body, starts inside cabinet) -->
+    <body name="bottle" pos="0 2.45 0.75">
+      <freejoint name="bottle_free"/>
+      <geom name="bottle_body" type="cylinder" size="0.035 0.1"  pos="0 0 0"    material="bottle" mass="0.35" condim="4" friction="0.8 0.02 0.01"/>
+      <geom name="bottle_neck" type="cylinder" size="0.018 0.04" pos="0 0 0.14" material="bottle" mass="0.05"/>
+      <geom name="bottle_cap"  type="cylinder" size="0.022 0.01" pos="0 0 0.185" rgba="0.9 0.3 0.1 1" mass="0.02"/>
+      <site name="bottle_center" pos="0 0 0" size="0.001"/>
+    </body>
+
+    <!-- Floor obstacles -->
+    <body name="box_obs1" pos="1.2 1.0 0">
+      <geom type="box" size="0.12 0.1 0.08" rgba="0.7 0.5 0.3 1" mass="2.0"/>
+    </body>
+    <body name="box_obs2" pos="-1.0 0.8 0">
+      <geom type="box" size="0.08 0.12 0.12" rgba="0.5 0.6 0.4 1" mass="1.5"/>
+    </body>
+    <!-- Mocap body: invisible tracking anchor for pelvis weld -->
+    <body name="pelvis_mocap" mocap="true" pos="0 0 0.93">
+      <geom type="sphere" size="0.01" rgba="0 0 0 0" contype="0" conaffinity="0" mass="0"/>
+    </body>
+
+  </worldbody>
+
+  <!-- H1 humanoid robot (worldbody + actuators + contact excludes) -->
+  <include file="h1_model.xml"/>
+
+  <!-- Weld pelvis to mocap anchor for stable control.
+       We drive mocap_pos in Python to simulate locomotion. -->
+  <equality>
+    <weld name="pelvis_anchor" body1="pelvis" body2="pelvis_mocap"
+          solref="0.005 1" solimp="0.99 0.999 0.0001"/>
+  </equality>
+
+  <sensor>
+    <framequat   name="imu_quat"          objtype="body" objname="pelvis"/>
+    <frameangvel name="imu_gyro"          objtype="body" objname="pelvis"/>
+    <framelinvel name="imu_accel"         objtype="body" objname="pelvis"/>
+    <force       name="left_foot_force"   site="left_foot_contact"/>
+    <force       name="right_foot_force"  site="right_foot_contact"/>
+    <framepos    name="left_hand_pos"     objtype="site" objname="left_hand_site"/>
+    <framepos    name="right_hand_pos"    objtype="site" objname="right_hand_site"/>
+    <framepos    name="bottle_pos"        objtype="site" objname="bottle_center"/>
+    <framepos    name="shelf_target_pos"  objtype="site" objname="shelf_target"/>
+  </sensor>
+
+</mujoco>
