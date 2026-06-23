@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:05,233
+[NAVIGATE] Humanoid navigating to cabinet
+
+2
+00:00:05,233 --> 00:00:07,400
+[OPEN_DOOR] Opening cabinet door (hinge, damping=2.0)
+
+3
+00:00:07,400 --> 00:00:10,333
+[REACH] Reaching: mj_contactForce regulates offset
+
+4
+00:00:10,333 --> 00:00:12,300
+[GRASP] 3-finger grasp: tendon-coupled, slip reflex
+
+5
+00:00:12,300 --> 00:00:17,766
+[CARRY] Carrying bottle (foot-load balance gain)
+
+6
+00:00:17,766 --> 00:00:18,766
+[PLACE] Placing on shelf (position verified)
+
+7
+00:00:18,766 --> 00:00:18,766
+[DONE] Mission complete — 3/3 success
