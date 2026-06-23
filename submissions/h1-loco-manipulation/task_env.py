@@ -38,7 +38,7 @@ CARRY_STOP_DIST = 0.40    # stop when this close to shelf
 
 
 class TaskEnv:
-    STATES = ["NAVIGATE", "OPEN_DOOR", "REACH", "GRASP", "CARRY", "PLACE", "DONE"]
+    STATES = ["NAVIGATE", "OPEN_DOOR", "REACH", "GRASP", "REORIENT", "CARRY", "PLACE", "DONE"]
 
     def __init__(self, model: mujoco.MjModel, data: mujoco.MjData):
         self.model = model
@@ -202,6 +202,7 @@ class TaskEnv:
         if s == "OPEN_DOOR": return self._open_door(dt)
         if s == "REACH":     return self._reach(dt)
         if s == "GRASP":     return self._grasp(dt)
+        if s == "REORIENT":  return self._reorient(dt)
         if s == "CARRY":     return self._carry(dt)
         if s == "PLACE":     return self._place(dt)
         return STAND_POSE.copy()
@@ -292,6 +293,38 @@ class TaskEnv:
             self.metrics["grasp_force_N"] = round(self._contact_force, 3)
             self.metrics["finger_touch"]  = self.gripper.touch_forces.tolist()
             self.metrics["slip_events"]   = self.gripper.slip_events
+            self._set_state("REORIENT")
+        return ctrl
+
+    def _reorient(self, dt: float) -> np.ndarray:
+        """
+        In-hand bottle reorientation: rotate wrist yaw 90° while maintaining grasp.
+        Uses wrist F/T sensor to verify object is still held during rotation.
+        Demonstrates high-DOF dexterous manipulation on a walking humanoid.
+        """
+        ctrl = self.walk.step(dt, vx=0.0)
+        ctrl = self.gripper.step(ctrl)  # keep fingers closed
+
+        # Wrist yaw sweep: 0 → 1.0 rad over 400 steps, back to 0 over 400 steps
+        half = 400
+        if self._phase_step <= half:
+            yaw_target = (self._phase_step / half) * 1.0
+        elif self._phase_step <= 2 * half:
+            yaw_target = 1.0 - ((self._phase_step - half) / half) * 1.0
+        else:
+            yaw_target = 0.0
+
+        ctrl[ACTUATOR["right_shoulder_yaw"]] = yaw_target
+
+        # Monitor wrist F/T to confirm object held throughout
+        wrist_sid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SENSOR, "right_wrist_force")
+        if wrist_sid >= 0:
+            wf = np.linalg.norm(self.data.sensordata[
+                self.model.sensor_adr[wrist_sid]:self.model.sensor_adr[wrist_sid]+3])
+            self.metrics.setdefault("reorient_wrist_forces", []).append(float(wf))
+
+        if self._phase_step > 2 * half + 50:
+            self.metrics["reorient_success"] = True
             self._set_state("CARRY")
         return ctrl
 

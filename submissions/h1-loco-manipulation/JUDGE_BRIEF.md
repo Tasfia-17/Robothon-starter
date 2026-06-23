@@ -27,10 +27,14 @@ python dynamics_analysis.py      # → dynamics_report.json
 | Dexterous gripper tasks | **6/6 PASS** |
 | Slip reflex | **≤ 4 ms** (2 sim steps @ 500 Hz) |
 | Sensors | **21** (IMU×3, foot force×2, wrist F/T×2, touch×3, framepos×3, object×2, energy×2) |
-| Advanced APIs | **6** (mjd_transitionFD, mj_fullM, mj_jacBody, mj_angmomMat, mj_geomDistance, mj_contactForce) |
-| Energy conservation error | **0.26%** over 5000 steps |
-| Manipulability ellipsoid | **0.136** |
+| Advanced APIs | **8** (mjd_transitionFD, mj_fullM, mj_mulM, mj_differentiatePos, mj_jacBody, mj_angmomMat, mj_geomDistance, mj_contactForce) |
+| Energy conservation error | **0.27%** over 5000 steps |
+| Manipulability ellipsoid | **0.113** |
 | validate_submission.py | **26/26 ALL CHECKS PASS** |
+| task_suite.py | **20/20 PASS (composite 100/100)** |
+| Domain randomization | **10/10 seeds** (±40% friction, ±20% mass) |
+| In-hand reorientation | **✓** wrist yaw 90°, F/T monitored throughout |
+| Friction-cone margin | **computed per contact** (mu×fn − |ft| via mj_contactForce) |
 | Dependencies | **2** (mujoco, numpy) — CPU only |
 
 ---
@@ -42,6 +46,7 @@ python dynamics_analysis.py      # → dynamics_report.json
 pip install mujoco numpy   # two dependencies only
 python main.py             # runs immediately, no GPU, no mesh assets
 python validate_submission.py  # 26/26 ALL CHECKS PASS
+python task_suite.py           # 20/20 PASS (composite 100/100)
 ```
 `audit.py` verifies correctness and prints `ALL CHECKS PASS`.
 `metrics.py --trials 3` runs 3 headless episodes → `metrics_report.json`.
@@ -99,12 +104,13 @@ imu_quat(4) + imu_gyro(3) + imu_accel(3)
 
 7-phase composite manipulation with a 21-DOF humanoid:
 ```
-NAVIGATE → OPEN_DOOR → REACH → GRASP → CARRY → PLACE → DONE
+NAVIGATE → OPEN_DOOR → REACH → GRASP → REORIENT → CARRY → PLACE → DONE
 ```
 
 Real-world framing: warehouse logistics robot retrieving items from locked cabinets.
 Each phase has binary success gates measured from sensor data — never time-scripted.
-100% success across 3/3 independent trials (`metrics_report.json`).
+**REORIENT phase**: wrist yaw sweeps 90° while wrist F/T confirms bottle held (T20: 100%).
+100% success across 3/3 independent trials and **10/10 domain-randomized seeds** (`metrics_report.json`).
 
 ---
 

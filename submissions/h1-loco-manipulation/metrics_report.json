@@ -2,7 +2,7 @@
   "trials": 3,
   "success_count": 3,
   "success_rate": 1.0,
-  "mean_sim_time": 19.15,
+  "mean_sim_time": 20.85,
   "sensors_used": [
     "imu_quat",
     "imu_gyro",
@@ -22,10 +22,10 @@
       "grasp_success": true,
       "place_success": true,
       "fall_count": 0,
-      "peak_contact_N": 78677.85,
-      "mean_foot_N": 55.29,
-      "steps": 9574,
-      "sim_time_s": 19.15
+      "peak_contact_N": 77037.63,
+      "mean_foot_N": 52.6,
+      "steps": 10425,
+      "sim_time_s": 20.85
     },
     {
       "door_opened": true,
@@ -33,10 +33,10 @@
       "grasp_success": true,
       "place_success": true,
       "fall_count": 0,
-      "peak_contact_N": 78677.85,
-      "mean_foot_N": 55.29,
-      "steps": 9574,
-      "sim_time_s": 19.15
+      "peak_contact_N": 77037.63,
+      "mean_foot_N": 52.6,
+      "steps": 10425,
+      "sim_time_s": 20.85
     },
     {
       "door_opened": true,
@@ -44,10 +44,10 @@
       "grasp_success": true,
       "place_success": true,
       "fall_count": 0,
-      "peak_contact_N": 78677.85,
-      "mean_foot_N": 55.29,
-      "steps": 9574,
-      "sim_time_s": 19.15
+      "peak_contact_N": 77037.63,
+      "mean_foot_N": 52.6,
+      "steps": 10425,
+      "sim_time_s": 20.85
     }
   ]
 }

@@ -24,6 +24,7 @@ TH = 23
 FORCE_TARGET   = 2.0   # N per fingertip (gentle)
 FORCE_MAX      = 5.0   # N — slip reflex triggers above this
 SLIP_THRESH    = 0.3   # friction-cone margin: mu*fn - |ft| < SLIP_THRESH → slip
+FINGER_MU      = 1.5   # friction coefficient (matches geom friction in h1_model.xml)
 CLOSE_POSE     = 1.1   # rad — fully closed MCP angle
 OPEN_POSE      = 0.0   # rad — open
 PREGRASP_POSE  = 0.4   # rad — pre-grasp (wide enough for bottle)
@@ -57,6 +58,7 @@ class DexGraspController:
         self.touch_forces = np.zeros(3)   # [f1, f2, th] N
         self.slip_events  = 0
         self.grasp_active = False
+        self.friction_cone_margins: list[float] = []  # mu*fn - |ft| per contact per step
 
     def _read_touch(self):
         """Read touch forces — uses both touch sensors AND contact array for robustness."""
@@ -90,11 +92,45 @@ class DexGraspController:
         self.touch_forces[2] = max(t2, contact_force[2])
 
     def _slip_detected(self) -> bool:
-        """True if any finger has suspiciously low touch force while grasping."""
+        """
+        Friction-cone slip detection using mj_contactForce.
+        For each contact involving a finger geom, compute the friction-cone margin:
+            margin = mu * |f_normal| - |f_tangential|
+        If margin < SLIP_THRESH for any active finger → slip imminent.
+        Falls back to touch-sensor check when no contacts present.
+        """
         if not self.grasp_active:
             return False
-        # If we expect contact but force is near zero → slip
-        return bool(np.any(self.touch_forces < 0.05))
+
+        finger_bodies = set()
+        for name in ("f1_prox","f1_dist","f2_prox","f2_dist","thumb_prox","thumb_dist"):
+            bid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, name)
+            if bid >= 0:
+                finger_bodies.add(bid)
+
+        slip = False
+        n_finger_contacts = 0
+        for i in range(self.data.ncon):
+            c = self.data.contact[i]
+            b1 = self.model.geom_bodyid[c.geom1]
+            b2 = self.model.geom_bodyid[c.geom2]
+            if b1 not in finger_bodies and b2 not in finger_bodies:
+                continue
+            f = np.zeros(6)
+            mujoco.mj_contactForce(self.model, self.data, i, f)
+            fn = abs(f[0])          # normal force (contact frame axis 0)
+            ft = np.linalg.norm(f[1:3])  # tangential force magnitude
+            margin = FINGER_MU * fn - ft
+            n_finger_contacts += 1
+            self.friction_cone_margins.append(round(float(margin), 4))
+            if margin < SLIP_THRESH:
+                slip = True
+
+        # Fallback: if no finger contacts but grasping, treat as slip
+        if n_finger_contacts == 0 and self.grasp_active:
+            slip = bool(np.any(self.touch_forces < 0.05))
+
+        return slip
 
     def open(self):
         self._state    = "OPEN"
@@ -159,10 +195,13 @@ class DexGraspController:
         return ctrl
 
     def summary(self) -> dict:
+        margins = self.friction_cone_margins
         return {
-            "state":         self._state,
-            "touch_forces":  [round(float(f), 3) for f in self.touch_forces],
-            "slip_events":   self.slip_events,
-            "grasp_active":  self.grasp_active,
-            "grip_cmd":      [round(float(c), 3) for c in self._grip_cmd],
+            "state":                self._state,
+            "touch_forces":         [round(float(f), 3) for f in self.touch_forces],
+            "slip_events":          self.slip_events,
+            "grasp_active":         self.grasp_active,
+            "grip_cmd":             [round(float(c), 3) for c in self._grip_cmd],
+            "friction_cone_margin_min":  round(float(min(margins)), 4) if margins else None,
+            "friction_cone_margin_mean": round(float(np.mean(margins)), 4) if margins else None,
         }

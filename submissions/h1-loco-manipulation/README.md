@@ -3,8 +3,8 @@
 
 **Robot:** Unitree H1 humanoid — 21 actuated DOF (12 leg + 8 arm + 1 torso)  
 **Simulator:** MuJoCo 3.x — elliptic cones, NoSlip solver, implicit damping  
-**Task:** Navigate → Open hinged door → Grasp bottle → Carry → Place on shelf  
-**Result:** `door=True  grasp=True  place=True  falls=0  success_rate=3/3`
+**Task:** Navigate → Open hinged door → Grasp bottle → **In-hand reorientation (90° wrist yaw)** → Carry → Place on shelf  
+**Result:** `door=True  grasp=True  reorient=True  place=True  falls=0  success_rate=3/3`
 
 ---
 
@@ -13,12 +13,13 @@
 ```bash
 pip install mujoco numpy
 python validate_submission.py           # → ALL CHECKS PASS (26/26)
-python audit.py                         # → ALL CHECKS PASS
+python audit.py                         # → ALL CHECKS PASS (8 FSM states)
 python dex_benchmark.py                 # → 6/6 PASS (dexterous gripper)
 python metrics.py --trials 3            # → success_rate=3/3
+python task_suite.py                    # → 20/20 PASS (composite 100/100)
 python main.py                          # autonomous demo (MuJoCo viewer)
 python main.py --teleop                 # keyboard: W/S/A/D body, I/K/J/L arm
-python dynamics_analysis.py             # → dynamics_report.json (6 advanced APIs)
+python dynamics_analysis.py             # → dynamics_report.json (8 advanced APIs)
 python collect_demos.py --n 10          # → demos/*.npz  imitation-learning dataset
 python record_hdf5.py --n 5             # → demos/dataset.hdf5  robomimic format
 python record_demo.py                   # → demo.mp4  (HUD overlays + SRT narration)

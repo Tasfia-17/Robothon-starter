@@ -14,6 +14,8 @@
     "stable": true
   },
   "geom_distance_hand_to_bottle_m": 0.2768,
+  "mj_mulM_norm": 100.948155,
+  "mj_differentiatePos_norm": 0.01,
   "energy": {
     "mean_total_J": 2377.685,
     "std_J": 6.3997,
@@ -23,6 +25,8 @@
   "apis_used": [
     "mj_jacBody",
     "mj_fullM",
+    "mj_mulM",
+    "mj_differentiatePos",
     "mj_angmomMat",
     "mjd_transitionFD",
     "mj_geomDistance",

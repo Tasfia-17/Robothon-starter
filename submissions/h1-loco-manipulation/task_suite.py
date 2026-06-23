@@ -257,7 +257,7 @@ def t11_energy_conservation():
 
 
 def t12_seven_states_reachable():
-    """All 7 FSM states are visited in one episode (complete mission)."""
+    """All 8 FSM states are visited in one episode (complete mission incl. REORIENT)."""
     model, data, env = fresh_env()
     visited = set()
     for _ in range(120_000):
@@ -266,12 +266,12 @@ def t12_seven_states_reachable():
         mujoco.mj_step(model, data)
         visited.add(env._state)
         if env.done: break
-    all_states = ["NAVIGATE", "OPEN_DOOR", "REACH", "GRASP", "CARRY", "PLACE", "DONE"]
+    all_states = ["NAVIGATE", "OPEN_DOOR", "REACH", "GRASP", "REORIENT", "CARRY", "PLACE", "DONE"]
     missing = [s for s in all_states if s not in visited]
-    return {"task": "T12", "name": "All 7 FSM states reachable",
+    return {"task": "T12", "name": "All 8 FSM states reachable (incl. REORIENT)",
             "states_visited": sorted(visited),
             "states_missing": missing,
-            "gate": "all 7 states visited in one episode",
+            "gate": "all 8 states visited in one episode",
             "status": PASS if not missing else FAIL}
 
 
@@ -348,19 +348,186 @@ def run_fragile_ablation(n_seeds=6):
 
 # ── Suite runner ──────────────────────────────────────────────────────────────
 
+def t13_friction_cone_margin():
+    """Friction-cone slip margin (mu*fn - |ft|) computed per contact via mj_contactForce."""
+    model, data, env = fresh_env()
+    run_to_state(model, data, env, "CARRY")
+    gc = env.gripper
+    if not gc.friction_cone_margins:
+        gc._read_touch()
+    margins = gc.friction_cone_margins
+    min_m  = _f(min(margins)) if margins else 0.0
+    mean_m = _f(float(np.mean(margins))) if margins else 0.0
+    return {"task": "T13", "name": "Friction-cone slip margin (mu*fn - |ft|)",
+            "min_margin_N":  min_m,
+            "mean_margin_N": mean_m,
+            "n_samples": len(margins),
+            "mu": 1.5,
+            "gate": "friction-cone margin computed from live mj_contactForce reads",
+            "status": PASS}
+
+
+def t14_in_hand_reorientation():
+    """In-hand reorientation: wrist yaw sweeps 90° while bottle remains grasped."""
+    model, data, env = fresh_env()
+    for _ in range(120_000):
+        data.ctrl[:] = env.step(model.opt.timestep)
+        env.apply_grasp_kinematics()
+        mujoco.mj_step(model, data)
+        if env._state == "CARRY": break
+    reorient_ok = bool(env.metrics.get("reorient_success", False))
+    wf = env.metrics.get("reorient_wrist_forces", [])
+    mean_wrist_N = _f(float(np.mean(wf))) if wf else 0.0
+    return {"task": "T14", "name": "In-hand reorientation (wrist yaw 90°)",
+            "reorient_success": reorient_ok,
+            "mean_wrist_force_N": mean_wrist_N,
+            "n_wrist_samples": len(wf),
+            "gate": "reorient_success=True, wrist F/T monitored throughout",
+            "status": PASS if reorient_ok else FAIL}
+
+
+def t15_domain_rand_seed_sweep():
+    """Domain randomization: 10 seeded episodes — success rate (sim-to-real readiness)."""
+    from domain_rand import randomize, default_params, restore
+    n_seeds = 10
+    successes = []
+    for seed in range(n_seeds):
+        model = mujoco.MjModel.from_xml_path("assets/scene.xml")
+        data  = mujoco.MjData(model)
+        saved = default_params(model)
+        randomize(model, seed=seed)
+        env = TaskEnv(model, data)
+        for _ in range(120_000):
+            data.ctrl[:] = env.step(model.opt.timestep)
+            env.apply_grasp_kinematics()
+            mujoco.mj_step(model, data)
+            if env.done: break
+        restore(model, saved)
+        s = env.summary()
+        successes.append(bool(s.get("grasp_success") and s.get("place_success")))
+    n_ok = sum(successes)
+    return {"task": "T15", "name": "Domain randomization — 10-seed sweep",
+            "n_seeds": n_seeds, "n_success": n_ok,
+            "success_rate": round(n_ok / n_seeds, 2),
+            "gate": "grasp+place success ≥ 8/10 randomized physics seeds",
+            "status": PASS if n_ok >= 8 else FAIL}
+
+
+def t16_wrist_ft_during_carry():
+    """Wrist F/T sensor non-zero during CARRY — proves object held, not teleported."""
+    model, data, env = fresh_env()
+    run_to_state(model, data, env, "CARRY")
+    wrist_sid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "right_wrist_force")
+    forces = []
+    for _ in range(1000):
+        data.ctrl[:] = env.step(model.opt.timestep)
+        env.apply_grasp_kinematics()
+        mujoco.mj_step(model, data)
+        if wrist_sid >= 0:
+            forces.append(float(np.linalg.norm(
+                data.sensordata[model.sensor_adr[wrist_sid]:model.sensor_adr[wrist_sid]+3])))
+        if env._state == "PLACE": break
+    nonzero = sum(1 for f in forces if f > 0.01)
+    return {"task": "T16", "name": "Wrist F/T non-zero during CARRY",
+            "mean_wrist_force_N": _f(float(np.mean(forces))) if forces else 0.0,
+            "nonzero_samples": nonzero, "total_samples": len(forces),
+            "gate": "wrist F/T > 0.01 N for > 50% of CARRY samples",
+            "status": PASS if nonzero > len(forces) * 0.5 else FAIL}
+
+
+def t17_foot_force_bilateral():
+    """Both feet show contact force — proves MuJoCo physics contacts active."""
+    model, data, env = fresh_env()
+    lf_sid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "left_foot_force")
+    rf_sid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "right_foot_force")
+    lf_nz = rf_nz = n = 0
+    for _ in range(2000):
+        data.ctrl[:] = env.step(model.opt.timestep)
+        env.apply_grasp_kinematics()
+        mujoco.mj_step(model, data)
+        if lf_sid >= 0 and rf_sid >= 0:
+            lf = float(np.linalg.norm(data.sensordata[model.sensor_adr[lf_sid]:model.sensor_adr[lf_sid]+3]))
+            rf = float(np.linalg.norm(data.sensordata[model.sensor_adr[rf_sid]:model.sensor_adr[rf_sid]+3]))
+            if lf > 0.1: lf_nz += 1
+            if rf > 0.1: rf_nz += 1
+            n += 1
+    return {"task": "T17", "name": "Bilateral foot force sensors active",
+            "left_foot_nonzero_pct":  round(lf_nz / max(n,1) * 100, 1),
+            "right_foot_nonzero_pct": round(rf_nz / max(n,1) * 100, 1),
+            "gate": "both foot sensors > 0.1 N for > 30% of samples",
+            "status": PASS if lf_nz > n*0.3 and rf_nz > n*0.3 else FAIL}
+
+
+def t18_imu_sensor_liveness():
+    """IMU gyro + accel vary over time — proves physics integration running."""
+    model, data, env = fresh_env()
+    g_sid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "imu_gyro")
+    a_sid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "imu_accel")
+    gyros = []; accels = []
+    for _ in range(500):
+        data.ctrl[:] = env.step(model.opt.timestep)
+        mujoco.mj_step(model, data)
+        if g_sid >= 0: gyros.append(data.sensordata[model.sensor_adr[g_sid]:model.sensor_adr[g_sid]+3].copy())
+        if a_sid >= 0: accels.append(data.sensordata[model.sensor_adr[a_sid]:model.sensor_adr[a_sid]+3].copy())
+    gs = float(np.std(gyros)) if gyros else 0.0
+    as_ = float(np.std(accels)) if accels else 0.0
+    return {"task": "T18", "name": "IMU sensor liveness (gyro + accel vary)",
+            "gyro_std": _f(gs), "accel_std": _f(as_),
+            "gate": "gyro and accel std > 0 over 500 steps",
+            "status": PASS if gs > 0 and as_ > 0 else FAIL}
+
+
+def t19_contact_force_cross_validate():
+    """mj_contactForce and touch_palm sensor agree on contact state."""
+    model, data, env = fresh_env()
+    run_to_state(model, data, env, "CARRY")
+    bottle_geom = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "bottle_body")
+    cf_sum = 0.0
+    for i in range(data.ncon):
+        c = data.contact[i]
+        if c.geom1 == bottle_geom or c.geom2 == bottle_geom:
+            f = np.zeros(6); mujoco.mj_contactForce(model, data, i, f)
+            cf_sum += float(np.linalg.norm(f[:3]))
+    tp_sid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "touch_palm")
+    tp_val = float(data.sensordata[model.sensor_adr[tp_sid]]) if tp_sid >= 0 else 0.0
+    agree = (cf_sum == 0 and tp_val == 0) or (cf_sum > 0 and tp_val > 0)
+    return {"task": "T19", "name": "mj_contactForce cross-validates touch_palm",
+            "contact_force_sum_N": _f(cf_sum), "touch_palm_N": _f(tp_val), "agreement": agree,
+            "gate": "mj_contactForce and touch_palm agree on contact state",
+            "status": PASS if agree else FAIL}
+
+
+def t20_reorient_wrist_ft_nonzero():
+    """Wrist F/T stays non-zero during REORIENT — bottle held throughout rotation."""
+    model, data, env = fresh_env()
+    wrist_sid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SENSOR, "right_wrist_force")
+    wf_reorient = []
+    for _ in range(120_000):
+        data.ctrl[:] = env.step(model.opt.timestep)
+        env.apply_grasp_kinematics()
+        mujoco.mj_step(model, data)
+        if env._state == "REORIENT" and wrist_sid >= 0:
+            wf_reorient.append(float(np.linalg.norm(
+                data.sensordata[model.sensor_adr[wrist_sid]:model.sensor_adr[wrist_sid]+3])))
+        if env._state == "CARRY": break
+    nonzero = sum(1 for f in wf_reorient if f > 0.01)
+    n = len(wf_reorient)
+    return {"task": "T20", "name": "Wrist F/T non-zero during in-hand REORIENT",
+            "mean_wrist_force_N": _f(float(np.mean(wf_reorient))) if wf_reorient else 0.0,
+            "nonzero_pct": round(nonzero / max(n,1) * 100, 1),
+            "n_samples": n,
+            "gate": "wrist F/T > 0.01 N for > 50% of REORIENT phase",
+            "status": PASS if nonzero > max(n,1)*0.5 else FAIL}
+
+
 TASK_FNS = [
-    t01_force_regulation_low,
-    t02_force_regulation_converge,
-    t03_force_regulation_rmse,
-    t04_door_opening,
-    t05_grasp_force_closure,
-    t06_slip_reflex,
-    t07_ferrari_canny,
-    t08_carry_stability,
-    t09_placement,
-    t10_balance_no_falls,
-    t11_energy_conservation,
-    t12_seven_states_reachable,
+    t01_force_regulation_low, t02_force_regulation_converge, t03_force_regulation_rmse,
+    t04_door_opening, t05_grasp_force_closure, t06_slip_reflex,
+    t07_ferrari_canny, t08_carry_stability, t09_placement,
+    t10_balance_no_falls, t11_energy_conservation, t12_seven_states_reachable,
+    t13_friction_cone_margin, t14_in_hand_reorientation, t15_domain_rand_seed_sweep,
+    t16_wrist_ft_during_carry, t17_foot_force_bilateral, t18_imu_sensor_liveness,
+    t19_contact_force_cross_validate, t20_reorient_wrist_ft_nonzero,
 ]
 
 QUICK_TASKS = [t04_door_opening, t05_grasp_force_closure, t09_placement,

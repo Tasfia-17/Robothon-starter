@@ -41,7 +41,7 @@
       "touch_forces_N": [
         0.0,
         0.0,
-        249.648
+        249.663
       ],
       "gate": "gripper in HOLDING state, finger_contacts \u2265 1"
     },
@@ -62,7 +62,7 @@
     },
     "T5_slip_reflex": {
       "status": "PASS",
-      "slip_events_total": 801,
+      "slip_events_total": 636,
       "grip_before": [
         1.1,
         1.1,
@@ -81,7 +81,7 @@
       "epsilon_quality": 0.0,
       "grasp_isotropy": 0.251682,
       "n_contacts": 2,
-      "total_force_N": 8236.0483,
+      "total_force_N": 8236.0481,
       "force_closure": false,
       "gate": "n_contacts >= 1 (contact-force measured via mj_contactForce)"
     }

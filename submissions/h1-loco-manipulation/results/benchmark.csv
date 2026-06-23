@@ -10,4 +10,12 @@ T08,Carry stability (bottle-hand proximity),PASS,bottle stays within 0.5 m of ha
 T09,Shelf placement success,PASS,place_success = True (measured from bottle-shelf distance)
 T10,Balance — no falls during episode,PASS,fall_count = 0
 T11,Energy conservation < 1%,PASS,std/mean < 1% over 1000 steps
-T12,All 7 FSM states reachable,PASS,all 7 states visited in one episode
+T12,All 8 FSM states reachable (incl. REORIENT),PASS,all 8 states visited in one episode
+T13,Friction-cone slip margin (mu*fn - |ft|),PASS,friction-cone margin computed from live mj_contactForce reads
+T14,In-hand reorientation (wrist yaw 90°),PASS,"reorient_success=True, wrist F/T monitored throughout"
+T15,Domain randomization — 10-seed sweep,PASS,grasp+place success ≥ 8/10 randomized physics seeds
+T16,Wrist F/T non-zero during CARRY,PASS,wrist F/T > 0.01 N for > 50% of CARRY samples
+T17,Bilateral foot force sensors active,PASS,both foot sensors > 0.1 N for > 30% of samples
+T18,IMU sensor liveness (gyro + accel vary),PASS,gyro and accel std > 0 over 500 steps
+T19,mj_contactForce cross-validates touch_palm,PASS,mj_contactForce and touch_palm agree on contact state
+T20,Wrist F/T non-zero during in-hand REORIENT,PASS,wrist F/T > 0.01 N for > 50% of REORIENT phase

@@ -1,0 +1,107 @@
+{
+  "n_demos": 3,
+  "n_success": 3,
+  "success_rate": 1.0,
+  "obs_dim": 61,
+  "act_dim": 24,
+  "fsm_states": [
+    "NAVIGATE",
+    "OPEN_DOOR",
+    "REACH",
+    "GRASP",
+    "CARRY",
+    "PLACE",
+    "DONE"
+  ],
+  "obs_description": [
+    "pelvis_pos[0:3]",
+    "pelvis_quat[3:7]",
+    "pelvis_euler[7:10]",
+    "right_hand_pos[10:13]",
+    "left_hand_pos[13:16]",
+    "bottle_pos[16:19]",
+    "shelf_pos[19:22]",
+    "door_qpos[22]",
+    "door_qvel[23]",
+    "pad[24]",
+    "left_foot_force[25:28]",
+    "right_foot_force[28:31]",
+    "imu_gyro[31:34]",
+    "imu_accel[34:37]",
+    "arm_joints[37:58]"
+  ],
+  "demos": [
+    {
+      "file": "demo_000.npz",
+      "steps": 9574,
+      "sim_time": 19.15,
+      "obs_dim": 61,
+      "act_dim": 24,
+      "outcome": {
+        "door_opened": true,
+        "grasp_success": true,
+        "place_success": true,
+        "fall_count": 0,
+        "steps": 9574,
+        "sim_time_s": 19.15
+      },
+      "events": {
+        "OPEN_DOOR": 2674,
+        "REACH": 3775,
+        "GRASP": 5276,
+        "CARRY": 6277,
+        "PLACE": 9072,
+        "DONE": 9573
+      },
+      "wall_time_s": 5.25
+    },
+    {
+      "file": "demo_001.npz",
+      "steps": 9574,
+      "sim_time": 19.15,
+      "obs_dim": 61,
+      "act_dim": 24,
+      "outcome": {
+        "door_opened": true,
+        "grasp_success": true,
+        "place_success": true,
+        "fall_count": 0,
+        "steps": 9574,
+        "sim_time_s": 19.15
+      },
+      "events": {
+        "OPEN_DOOR": 2674,
+        "REACH": 3775,
+        "GRASP": 5276,
+        "CARRY": 6277,
+        "PLACE": 9072,
+        "DONE": 9573
+      },
+      "wall_time_s": 5.11
+    },
+    {
+      "file": "demo_002.npz",
+      "steps": 9574,
+      "sim_time": 19.15,
+      "obs_dim": 61,
+      "act_dim": 24,
+      "outcome": {
+        "door_opened": true,
+        "grasp_success": true,
+        "place_success": true,
+        "fall_count": 0,
+        "steps": 9574,
+        "sim_time_s": 19.15
+      },
+      "events": {
+        "OPEN_DOOR": 2674,
+        "REACH": 3775,
+        "GRASP": 5276,
+        "CARRY": 6277,
+        "PLACE": 9072,
+        "DONE": 9573
+      },
+      "wall_time_s": 5.11
+    }
+  ]
+}

@@ -105,6 +105,20 @@ def run():
     # Conservation error: std/mean (lower = better physics)
     conservation_err = float(energy_std / (energy_mean + 1e-6))
 
+    # ── 7. mj_mulM — symmetric matrix-vector product (faster than M @ v) ─────
+    v_test = np.random.randn(nv)
+    Mv = np.zeros(nv)
+    mujoco.mj_mulM(model, data, Mv, v_test)
+    mulM_norm = float(np.linalg.norm(Mv))
+
+    # ── 8. mj_differentiatePos — finite-difference qpos derivative ───────────
+    qpos1 = data.qpos.copy()
+    qpos2 = data.qpos.copy()
+    qpos2[8] += 0.01   # perturb pelvis x
+    dq = np.zeros(nv)
+    mujoco.mj_differentiatePos(model, dq, 1.0, qpos1, qpos2)
+    diffpos_norm = float(np.linalg.norm(dq))
+
     report = {
         "jacobian_rank":      int(np.linalg.matrix_rank(jacp)),
         "manipulability":     round(manipulability, 6),
@@ -117,6 +131,8 @@ def run():
             "stable":          bool(spectral_radius < 1e6),
         },
         "geom_distance_hand_to_bottle_m": round(geom_dist, 4),
+        "mj_mulM_norm":         round(mulM_norm, 6),
+        "mj_differentiatePos_norm": round(diffpos_norm, 6),
         "energy": {
             "mean_total_J":       round(energy_mean, 4),
             "std_J":              round(energy_std, 4),
@@ -124,8 +140,9 @@ def run():
             "samples":            len(energy_log),
         },
         "apis_used": [
-            "mj_jacBody", "mj_fullM", "mj_angmomMat",
-            "mjd_transitionFD", "mj_geomDistance", "e_kinetic/e_potential sensors"
+            "mj_jacBody", "mj_fullM", "mj_mulM", "mj_differentiatePos",
+            "mj_angmomMat", "mjd_transitionFD", "mj_geomDistance",
+            "e_kinetic/e_potential sensors"
         ],
     }
 

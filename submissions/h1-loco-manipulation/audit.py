@@ -89,7 +89,7 @@ for _ in range(100_000):
     d.ctrl[:] = env2.step(m.opt.timestep); env2.apply_grasp_kinematics(); mujoco.mj_step(m, d)
     visited.add(env2.state)
     if env2.done: break
-for st in ["NAVIGATE", "OPEN_DOOR", "REACH", "GRASP", "CARRY", "PLACE", "DONE"]:
+for st in ["NAVIGATE", "OPEN_DOOR", "REACH", "GRASP", "REORIENT", "CARRY", "PLACE", "DONE"]:
     check(f"state {st} visited", st in visited)
 
 # ── [5] No time-driven outputs ────────────────────────────────────────────────
