@@ -12,17 +12,19 @@
 
 ```bash
 pip install mujoco numpy
+python validate_submission.py           # → ALL CHECKS PASS (26/26)
+python audit.py                         # → ALL CHECKS PASS
+python dex_benchmark.py                 # → 6/6 PASS (dexterous gripper)
+python metrics.py --trials 3            # → success_rate=3/3
 python main.py                          # autonomous demo (MuJoCo viewer)
 python main.py --teleop                 # keyboard: W/S/A/D body, I/K/J/L arm
-python main.py --no-render --trials 5   # headless batch → metrics_report.json
-python audit.py                         # → ALL CHECKS PASS
 python dynamics_analysis.py             # → dynamics_report.json (6 advanced APIs)
 python collect_demos.py --n 10          # → demos/*.npz  imitation-learning dataset
 python record_hdf5.py --n 5             # → demos/dataset.hdf5  robomimic format
-python record_demo.py                   # → demo.mp4
+python record_demo.py                   # → demo.mp4  (HUD overlays + SRT narration)
 ```
 
-No GPU required. Two dependencies only.
+No GPU required. Two dependencies only (`mujoco`, `numpy`).
 
 ---
 
@@ -83,6 +85,11 @@ No GPU required. Two dependencies only.
 | `mj_angmomMat` angular momentum Jacobian | ✅ |
 | `mj_geomDistance` signed proximity (no contact required) | ✅ |
 | `audit.py` → ALL CHECKS PASS | ✅ |
+| `validate_submission.py` → 26/26 ALL CHECKS PASS | ✅ |
+| 3-finger dexterous gripper: 6 DOF, 3 tendon-coupled joints, condim=4, friction=1.5 | ✅ |
+| Dex benchmark 6/6 PASS: open / pregrasp / force-closure / regulation / slip-reflex / Ferrari-Canny | ✅ |
+| Slip reflex: grip escalates within 4 ms (2 sim steps) of contact loss | ✅ |
+| Demo video with live HUD (state, force, gripper, FSM bar) + SRT narration + GIF preview | ✅ |
 
 ---
 
