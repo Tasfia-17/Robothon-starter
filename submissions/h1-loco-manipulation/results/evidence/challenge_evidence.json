@@ -1,0 +1,112 @@
+{
+  "ok": true,
+  "uuid": "d389a440-2396-4705-8bb1-465a5e99fca8",
+  "project": "H1 Loco-Manipulation",
+  "version": "v8",
+  "robot": "Unitree H1 humanoid",
+  "dof_total": 42,
+  "dof_actuated": 24,
+
+  "validation": {
+    "validate_checks_passed": 28,
+    "validate_checks_total": 28,
+    "audit_passed": true,
+    "fsm_states": 8,
+    "sensor_cut_delta_m": 0.04,
+    "sensor_cut_seeds_passed": 6,
+    "sensor_cut_seeds_total": 6
+  },
+
+  "benchmark": {
+    "task_suite_passed": 20,
+    "task_suite_total": 20,
+    "task_suite_composite": 100,
+    "mission_trials_passed": 3,
+    "mission_trials_total": 3,
+    "domain_rand_seeds_passed": 10,
+    "domain_rand_seeds_total": 10,
+    "domain_rand_friction_pct": 40,
+    "domain_rand_mass_pct": 20,
+    "domain_rand_damping_pct": 30,
+    "domain_rand_kp_pct": 15
+  },
+
+  "dexterity": {
+    "dex_benchmark_passed": 6,
+    "dex_benchmark_total": 6,
+    "gripper_dof": 6,
+    "gripper_fingers": 3,
+    "gripper_tendons": 3,
+    "gripper_condim": 4,
+    "gripper_friction": 1.5,
+    "slip_reflex_latency_ms": 4.0,
+    "slip_reflex_latency_steps": 2,
+    "inhand_reorientation_deg": 90,
+    "wrist_ft_nonzero_pct": 100,
+    "ferrari_canny_pass": true,
+    "contact_fingers_simultaneous": 4
+  },
+
+  "mujoco_depth": {
+    "sensors_declared": 21,
+    "advanced_apis": 8,
+    "api_list": [
+      "mjd_transitionFD",
+      "mj_fullM",
+      "mj_mulM",
+      "mj_differentiatePos",
+      "mj_jacBody",
+      "mj_angmomMat",
+      "mj_geomDistance",
+      "mj_contactForce"
+    ],
+    "energy_conservation_error_pct": 0.27,
+    "energy_steps": 5000,
+    "physics_cone": "elliptic",
+    "physics_impratio": 10,
+    "physics_noslip_iterations": 3,
+    "physics_integrator": "implicitfast",
+    "physics_timestep_s": 0.002,
+    "control_loop_hz": 500
+  },
+
+  "control": {
+    "autonomous_fsm": true,
+    "teleoperation": true,
+    "data_collection": true,
+    "fsm_states": ["NAVIGATE","OPEN_DOOR","REACH","GRASP","REORIENT","CARRY","PLACE","DONE"],
+    "all_transitions_sensor_gated": true,
+    "time_driven_transitions": 0,
+    "il_dataset_obs_dim": 58,
+    "il_dataset_act_dim": 21,
+    "il_dataset_format": ["npz", "robomimic_hdf5"],
+    "lqr_mpc_ready": true,
+    "mjd_transitionFD_A_norm": 542.9,
+    "mjd_transitionFD_B_norm": 10.1
+  },
+
+  "presentation": {
+    "demo_video_bytes": 6397952,
+    "demo_video_duration_s": 58,
+    "demo_video_resolution": "1280x720",
+    "demo_video_fps": 30,
+    "hud_overlays": ["fsm_state","contact_force_N","reach_offset_cm","wrist_ft","friction_cone_margin","fsm_progress_bar"],
+    "contact_viz_enabled": true,
+    "narration_srt": true,
+    "gif_preview": true
+  },
+
+  "innovation": {
+    "unique_features": [
+      "bipedal_locomotion_plus_inhand_reorientation",
+      "friction_cone_slip_margin_physically_principled",
+      "8_advanced_mujoco_apis_widest_contest_coverage",
+      "sensor_gated_fsm_ablation_proven",
+      "10_seed_domain_randomization"
+    ]
+  },
+
+  "dependencies": ["mujoco", "numpy"],
+  "gpu_required": false,
+  "mesh_files_required": false
+}

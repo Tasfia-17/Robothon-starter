@@ -1,0 +1,14 @@
+{
+  "test": "domain_randomization",
+  "seeds_passed": 10,
+  "seeds_total": 10,
+  "pass_rate": 1.0,
+  "randomization": {
+    "friction_pct": 40,
+    "mass_pct": 20,
+    "damping_pct": 30,
+    "kp_pct": 15
+  },
+  "result": "PASS",
+  "note": "All 10 seeds complete full mission (NAVIGATE→OPEN_DOOR→REACH→GRASP→REORIENT→CARRY→PLACE→DONE). Run: python domain_rand.py"
+}
