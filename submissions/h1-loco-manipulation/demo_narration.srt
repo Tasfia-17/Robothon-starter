@@ -1,31 +1,31 @@
 1
-00:00:00,000 --> 00:00:07,233
+00:00:00,000 --> 00:00:12,466
 [NAVIGATE] H1 humanoid navigating to locked cabinet
 
 2
-00:00:07,233 --> 00:00:13,733
+00:00:12,466 --> 00:00:25,466
 [OPEN_DOOR] Opening hinged door — arm IK + hinge physics
 
 3
-00:00:13,733 --> 00:00:25,466
+00:00:25,466 --> 00:00:48,933
 [REACH] Force-regulated reach: mj_contactForce → reach_offset P-loop
 
 4
-00:00:25,466 --> 00:00:35,299
+00:00:48,933 --> 00:01:08,599
 [GRASP] 3-finger grasp: tendon-coupled, friction-cone slip reflex
 
 5
-00:00:35,299 --> 00:00:43,633
+00:01:08,599 --> 00:01:25,266
 [REORIENT] In-hand reorientation: wrist yaw 90° while bottle held
 
 6
-00:00:43,633 --> 00:00:49,100
+00:01:25,266 --> 00:01:41,666
 [CARRY] Carrying bottle — foot-load-scaled IMU balance
 
 7
-00:00:49,100 --> 00:00:53,100
+00:01:41,666 --> 00:01:49,666
 [PLACE] Placing on target shelf (bottle position from sensor)
 
 8
-00:00:53,100 --> 00:00:53,100
+00:01:49,666 --> 00:01:49,666
 [DONE] Mission complete ✓  door · grasp · reorient · place

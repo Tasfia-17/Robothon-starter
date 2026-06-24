@@ -17,23 +17,27 @@ import mujoco
 from task_env import TaskEnv
 
 SCENE = pathlib.Path(__file__).parent / "assets/scene.xml"
-OUT   = pathlib.Path(__file__).parent / "demo.mp4"
+OUT   = pathlib.Path(__file__).parent / "results/demo.mp4"
 GIF   = pathlib.Path(__file__).parent / "demo_preview.gif"
 SRT   = pathlib.Path(__file__).parent / "demo_narration.srt"
+KF    = pathlib.Path(__file__).parent / "media/keyframes.png"
+pathlib.Path(__file__).parent.joinpath("results").mkdir(exist_ok=True)
+pathlib.Path(__file__).parent.joinpath("media").mkdir(exist_ok=True)
 W, H, FPS = 1280, 720, 30
 DT = 0.002
 SPF = max(1, int(round(1.0 / (FPS * DT))))  # sim steps per frame = 17 (≈real-time)
 
 # Slow-motion multiplier per state (replay each frame N times)
+# Higher = longer per-phase footage → ~90s total video
 SLOWMO = {
-    "NAVIGATE":  1,
-    "OPEN_DOOR": 3,   # slow: show door hinge physics
-    "REACH":     4,   # slow: show force regulation
-    "GRASP":     5,   # slow: show finger closure
-    "REORIENT":  5,   # slow: show in-hand rotation
-    "CARRY":     1,
-    "PLACE":     4,   # slow: show placement
-    "DONE":      2,
+    "NAVIGATE":  2,
+    "OPEN_DOOR": 6,
+    "REACH":     8,
+    "GRASP":     10,
+    "REORIENT":  10,
+    "CARRY":     3,
+    "PLACE":     8,
+    "DONE":      3,
 }
 
 # Camera settings per FSM state: (distance, elevation, azimuth, lookat)
