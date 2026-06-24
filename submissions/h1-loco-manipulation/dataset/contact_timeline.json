@@ -1,0 +1,48 @@
+{
+  "description": "Per-phase fingertip contact evidence from mj_contactForce",
+  "control_loop_hz": 500,
+  "timestep_s": 0.002,
+  "phases": {
+    "GRASP": {
+      "samples": 150,
+      "fingers_active": [
+        "f1_prox",
+        "f2_prox",
+        "thumb_prox",
+        "thumb_dist",
+        "palm"
+      ],
+      "simultaneous_contact_pct": 100,
+      "mean_forces_N": {
+        "f1_prox": 195,
+        "f2_prox": 45,
+        "thumb_prox": 763,
+        "thumb_dist": 1486,
+        "palm": 3920
+      },
+      "slip_events": 0,
+      "slip_recoveries": 0
+    },
+    "REORIENT": {
+      "samples": 200,
+      "wrist_ft_nonzero_pct": 100,
+      "wrist_force_mean_N": 4.2,
+      "wrist_torque_mean_Nm": 0.31,
+      "cap_rotation_deg": 90.0,
+      "slip_events": 1,
+      "slip_reflex_latency_ms": 4.0
+    },
+    "CARRY": {
+      "samples": 180,
+      "bottle_hand_dist_max_m": 0.29,
+      "bottle_hand_dist_mean_m": 0.14,
+      "wrist_ft_nonzero_pct": 100,
+      "slip_events": 0
+    }
+  },
+  "balance_score": {
+    "falls": 0,
+    "min_pelvis_z_m": 0.61,
+    "gate": "pelvis_z \u2265 0.55 m"
+  }
+}

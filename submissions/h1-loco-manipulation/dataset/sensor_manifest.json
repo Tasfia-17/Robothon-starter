@@ -1,0 +1,152 @@
+{
+  "total_sensors": 21,
+  "sensors": [
+    {
+      "name": "imu_quat",
+      "type": "framequat",
+      "site": "pelvis_imu",
+      "role": "balance_controller",
+      "used_in": "loco_control.py"
+    },
+    {
+      "name": "imu_gyro",
+      "type": "frameangvel",
+      "site": "pelvis_imu",
+      "role": "balance_controller",
+      "used_in": "loco_control.py"
+    },
+    {
+      "name": "imu_accel",
+      "type": "framelinvel",
+      "site": "pelvis_imu",
+      "role": "balance_controller",
+      "used_in": "loco_control.py"
+    },
+    {
+      "name": "left_foot_force",
+      "type": "force",
+      "site": "left_foot",
+      "role": "balance_gain_scaling",
+      "used_in": "loco_control.py"
+    },
+    {
+      "name": "right_foot_force",
+      "type": "force",
+      "site": "right_foot",
+      "role": "balance_gain_scaling",
+      "used_in": "loco_control.py"
+    },
+    {
+      "name": "right_hand_pos",
+      "type": "framepos",
+      "site": "right_hand",
+      "role": "reach_gate",
+      "used_in": "task_env.py"
+    },
+    {
+      "name": "left_hand_pos",
+      "type": "framepos",
+      "site": "left_hand",
+      "role": "balance_reference",
+      "used_in": "loco_control.py"
+    },
+    {
+      "name": "right_wrist_force",
+      "type": "force",
+      "site": "right_wrist",
+      "role": "carry_hold_verify",
+      "used_in": "dex_grasp.py"
+    },
+    {
+      "name": "right_wrist_torque",
+      "type": "torque",
+      "site": "right_wrist",
+      "role": "reorient_verify",
+      "used_in": "dex_grasp.py"
+    },
+    {
+      "name": "touch_palm",
+      "type": "touch",
+      "geom": "palm_geom",
+      "role": "contact_gate",
+      "used_in": "dex_grasp.py"
+    },
+    {
+      "name": "touch_f1",
+      "type": "touch",
+      "geom": "f1_tip",
+      "role": "slip_reflex",
+      "used_in": "dex_grasp.py"
+    },
+    {
+      "name": "touch_f2",
+      "type": "touch",
+      "geom": "f2_tip",
+      "role": "slip_reflex",
+      "used_in": "dex_grasp.py"
+    },
+    {
+      "name": "touch_th",
+      "type": "touch",
+      "geom": "th_tip",
+      "role": "slip_reflex",
+      "used_in": "dex_grasp.py"
+    },
+    {
+      "name": "pos_f1_tip",
+      "type": "framepos",
+      "site": "f1_tip_site",
+      "role": "fingertip_ik",
+      "used_in": "arm_control.py"
+    },
+    {
+      "name": "pos_f2_tip",
+      "type": "framepos",
+      "site": "f2_tip_site",
+      "role": "fingertip_ik",
+      "used_in": "arm_control.py"
+    },
+    {
+      "name": "pos_th_tip",
+      "type": "framepos",
+      "site": "th_tip_site",
+      "role": "fingertip_ik",
+      "used_in": "arm_control.py"
+    },
+    {
+      "name": "bottle_pos",
+      "type": "framepos",
+      "site": "bottle_site",
+      "role": "grasp_reach_gate",
+      "used_in": "task_env.py"
+    },
+    {
+      "name": "shelf_pos",
+      "type": "framepos",
+      "site": "shelf_site",
+      "role": "place_gate",
+      "used_in": "task_env.py"
+    },
+    {
+      "name": "e_kinetic",
+      "type": "energy",
+      "site": "world",
+      "role": "energy_conservation",
+      "used_in": "dynamics_analysis.py"
+    },
+    {
+      "name": "e_potential",
+      "type": "energy",
+      "site": "world",
+      "role": "energy_conservation",
+      "used_in": "dynamics_analysis.py"
+    },
+    {
+      "name": "actuator_forces",
+      "type": "actuatorfrc",
+      "site": "world",
+      "role": "effort_monitor",
+      "used_in": "task_suite.py"
+    }
+  ]
+}

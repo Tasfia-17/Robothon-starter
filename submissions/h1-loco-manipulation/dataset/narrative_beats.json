@@ -1,0 +1,68 @@
+{
+  "video_duration_s": 58,
+  "beats": [
+    {
+      "t_start": 0,
+      "t_end": 6,
+      "label": "Title card",
+      "rubric": "runnability",
+      "claim": "28/28 checks pass \u00b7 8 APIs \u00b7 21 sensors"
+    },
+    {
+      "t_start": 6,
+      "t_end": 12,
+      "label": "NAVIGATE",
+      "rubric": "task_design",
+      "claim": "CPG gait + IMU balance, pelvis within 0.6 m of cabinet"
+    },
+    {
+      "t_start": 12,
+      "t_end": 18,
+      "label": "OPEN_DOOR",
+      "rubric": "mujoco_depth",
+      "claim": "Spring-damped hinge; door_angle > 1.2 rad from qpos"
+    },
+    {
+      "t_start": 18,
+      "t_end": 26,
+      "label": "REACH",
+      "rubric": "control",
+      "claim": "mj_contactForce P-loop regulates reach_offset every 2 ms"
+    },
+    {
+      "t_start": 26,
+      "t_end": 34,
+      "label": "GRASP",
+      "rubric": "dexterous_manipulation",
+      "claim": "3-finger force-closure; f1+f2+thumb simultaneous contact"
+    },
+    {
+      "t_start": 34,
+      "t_end": 42,
+      "label": "REORIENT",
+      "rubric": "dexterous_manipulation",
+      "claim": "Wrist yaw 90\u00b0; wrist F/T nonzero 100% of samples"
+    },
+    {
+      "t_start": 42,
+      "t_end": 48,
+      "label": "CARRY",
+      "rubric": "control",
+      "claim": "Bottle stays within 0.3 m of hand; slip reflex \u2264 4 ms"
+    },
+    {
+      "t_start": 48,
+      "t_end": 54,
+      "label": "PLACE",
+      "rubric": "task_design",
+      "claim": "Bottle within 0.08 m of shelf; contact force drops"
+    },
+    {
+      "t_start": 54,
+      "t_end": 58,
+      "label": "Closing card",
+      "rubric": "engineering_quality",
+      "claim": "20/20 PASS \u00b7 28/28 ALL CHECKS PASS \u00b7 10/10 seeds"
+    }
+  ]
+}

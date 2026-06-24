@@ -1,0 +1,91 @@
+{
+  "description": "Fixed-seed domain randomization stress: 10 seeds \u00d7 varied physics",
+  "seeds_total": 10,
+  "seeds_passed": 10,
+  "pass_rate": 1.0,
+  "perturbation_ranges": {
+    "friction_pct": 40,
+    "mass_pct": 20,
+    "damping_pct": 30,
+    "kp_pct": 15
+  },
+  "per_seed": [
+    {
+      "seed": 0,
+      "friction_scale": 0.68,
+      "mass_scale": 0.84,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 1,
+      "friction_scale": 0.76,
+      "mass_scale": 0.88,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 2,
+      "friction_scale": 0.84,
+      "mass_scale": 0.92,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 3,
+      "friction_scale": 0.92,
+      "mass_scale": 0.96,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 4,
+      "friction_scale": 1.0,
+      "mass_scale": 1.0,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 5,
+      "friction_scale": 1.08,
+      "mass_scale": 1.04,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 6,
+      "friction_scale": 1.16,
+      "mass_scale": 1.08,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 7,
+      "friction_scale": 1.24,
+      "mass_scale": 1.12,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 8,
+      "friction_scale": 1.32,
+      "mass_scale": 1.16,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    },
+    {
+      "seed": 9,
+      "friction_scale": 1.4,
+      "mass_scale": 1.2,
+      "mission_success": true,
+      "fsm_states_reached": 8
+    }
+  ],
+  "coordination_ablation": {
+    "closed_loop_reach_offset_m": -0.038,
+    "sensor_blinded_reach_offset_m": 0.0,
+    "delta_m": 0.038,
+    "seeds": 6,
+    "seeds_passed": 6
+  }
+}

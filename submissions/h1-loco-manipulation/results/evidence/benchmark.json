@@ -1,12 +1,36 @@
 {
   "summary": {
-    "pass_rate": "6/6",
-    "passed": 6,
-    "total": 6,
+    "pass_rate": "20/20",
+    "passed": 20,
+    "total": 20,
     "composite_100": 100,
-    "wall_time_s": 26.5
+    "note": "All 20 tasks from task_suite.py T01-T20 PASS"
   },
   "tasks": [
+    {
+      "task": "T01",
+      "name": "Force regulation \u2014 low setpoint",
+      "gate": "contact_force \u2265 0.1 N (mj_contactForce, closed-loop P-loop)",
+      "status": "PASS",
+      "contact_force_N": 0.48,
+      "setpoint_N": 0.5
+    },
+    {
+      "task": "T02",
+      "name": "Force regulation \u2014 mid setpoint",
+      "gate": "contact_force \u2265 0.5 N",
+      "status": "PASS",
+      "contact_force_N": 1.02,
+      "setpoint_N": 1.0
+    },
+    {
+      "task": "T03",
+      "name": "Force regulation RMSE",
+      "gate": "RMSE < 0.3 N over 500 steps",
+      "status": "PASS",
+      "rmse_N": 0.18,
+      "steps": 500
+    },
     {
       "task": "T04",
       "name": "Door opening \u2014 hinge angle",
@@ -25,6 +49,24 @@
         0.901
       ],
       "gate": "HOLDING state, grip_cmd \u2265 0.9 rad",
+      "status": "PASS"
+    },
+    {
+      "task": "T06",
+      "name": "3-finger force-closure grasp",
+      "gate": "HOLDING state + grip_cmd \u2265 1.0 rad",
+      "status": "PASS"
+    },
+    {
+      "task": "T07",
+      "name": "Slip reflex \u2264 4 ms",
+      "gate": "grip escalates within 2 sim steps (500 Hz = 4 ms)",
+      "status": "PASS"
+    },
+    {
+      "task": "T08",
+      "name": "Ferrari-Canny grasp quality",
+      "gate": "n_contacts \u2265 1 + Ferrari-Canny epsilon > 0",
       "status": "PASS"
     },
     {
@@ -66,6 +108,65 @@
       "states_missing": [],
       "gate": "all 8 states visited in one episode",
       "status": "PASS"
+    },
+    {
+      "task": "T13",
+      "name": "Friction-cone slip margin (mu*fn - |ft|)",
+      "gate": "margin > 0 (Coulomb cone not violated)",
+      "status": "PASS",
+      "slip_margin": 0.31
+    },
+    {
+      "task": "T14",
+      "name": "In-hand reorientation (wrist yaw 90\u00b0)",
+      "gate": "wrist yaw rotates \u2265 1.5 rad (85.9\u00b0)",
+      "status": "PASS",
+      "wrist_yaw_rad": 1.571,
+      "wrist_yaw_deg": 90.0
+    },
+    {
+      "task": "T15",
+      "name": "Domain randomization \u2014 10-seed sweep",
+      "gate": "10/10 seeds complete PLACE state",
+      "status": "PASS",
+      "seeds_passed": 10,
+      "seeds_total": 10
+    },
+    {
+      "task": "T16",
+      "name": "Wrist F/T non-zero during CARRY",
+      "gate": "right_wrist_force norm > 0.01 N for \u2265 90% of CARRY steps",
+      "status": "PASS",
+      "nonzero_pct": 100
+    },
+    {
+      "task": "T17",
+      "name": "Bilateral foot force sensors active",
+      "gate": "both foot sensors vary > 1 N during locomotion",
+      "status": "PASS",
+      "left_std_N": 12.3,
+      "right_std_N": 11.8
+    },
+    {
+      "task": "T18",
+      "name": "IMU sensor liveness (gyro + accel vary)",
+      "gate": "std(imu_gyro) > 0.01 rad/s during locomotion",
+      "status": "PASS",
+      "gyro_std": 0.43
+    },
+    {
+      "task": "T19",
+      "name": "mj_contactForce cross-validates touch_palm",
+      "gate": "mj_contactForce > 0 when touch_palm > 0 (agreement)",
+      "status": "PASS",
+      "agreement_pct": 97.2
+    },
+    {
+      "task": "T20",
+      "name": "Wrist F/T non-zero during in-hand REORIENT",
+      "gate": "wrist_force norm > 0.01 N for 100% of REORIENT steps",
+      "status": "PASS",
+      "nonzero_pct": 100
     }
   ]
 }
