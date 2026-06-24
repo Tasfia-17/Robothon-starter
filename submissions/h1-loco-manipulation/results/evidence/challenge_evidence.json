@@ -2,7 +2,7 @@
   "ok": true,
   "uuid": "d389a440-2396-4705-8bb1-465a5e99fca8",
   "project": "H1 Loco-Manipulation",
-  "version": "v8",
+  "version": "final",
   "robot": "Unitree H1 humanoid",
   "dof_total": 42,
   "dof_actuated": 24,

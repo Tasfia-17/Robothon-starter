@@ -32,7 +32,7 @@ def main():
     ok = True
 
     if args.audit or args.check or not any([args.check, args.demo, args.audit]):
-        ok &= run(["validate_submission.py"], "validate_submission.py  →  27/27 ALL CHECKS PASS")
+        ok &= run(["validate_submission.py"], "validate_submission.py  →  28/28 ALL CHECKS PASS")
         ok &= run(["audit.py"],               "audit.py  →  ALL CHECKS PASS")
         ok &= run(["dex_benchmark.py"],        "dex_benchmark.py  →  6/6 PASS")
         ok &= run(["dynamics_analysis.py"],    "dynamics_analysis.py  →  8 advanced APIs")
@@ -47,7 +47,7 @@ def main():
 
     print("\n" + "═"*55)
     print("  ALL CHECKS PASS")
-    print("  validate: 27/27 · audit: OK · dex: 6/6 · dynamics: 8 APIs")
+    print("  validate: 28/28 · audit: OK · dex: 6/6 · dynamics: 8 APIs")
     print("═"*55)
 
     if not args.check and not args.demo and not args.audit:

@@ -303,7 +303,7 @@ def main():
     end_lines = [
         ("Mission Complete",                               1.1,  (40, 220, 90)),
         ("door \u2713  grasp \u2713  reorient \u2713  place \u2713  falls: 0", 0.65, (200, 210, 200)),
-        ("validate_submission.py  \u2192  27/27 ALL CHECKS PASS",   0.55, (220, 220, 80)),
+        ("validate_submission.py  \u2192  28/28 ALL CHECKS PASS",   0.55, (220, 220, 80)),
         ("task_suite.py  \u2192  20/20 PASS  (composite 100/100)",  0.55, (220, 220, 80)),
         ("pip install mujoco numpy   \u2192   python main.py",       0.50, (160, 200, 255)),
     ]

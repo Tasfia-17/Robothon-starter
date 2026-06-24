@@ -61,7 +61,7 @@ If `margin < SLIP_THRESH` → slip reflex fires immediately (grip escalates with
 
 The `audit.py` static scan verifies no `time.time()` or `time.sleep()` appears in any control path.
 
-**Evidence:** `results/fragile_ablation.json` (6/6 seeds), `audit.py` check [5] (clean).
+**Evidence:** `ablation.json` (6/6 seeds), `audit.py` check [5] (clean).
 
 ---
 

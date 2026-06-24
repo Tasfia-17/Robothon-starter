@@ -211,6 +211,6 @@ results/
     dex_report.json       6/6 dex benchmark
     dynamics_report.json  8 API outputs
     robustness.json       10/10 domain-rand seeds
-    rubric_scorecard.json self-scored rubric (all 10/10)
+    rubric_scorecard.json prose rubric arguments (DUET-style)
     JUDGE_BRIEF.md        rubric criterion → code evidence + narrative path
 ```

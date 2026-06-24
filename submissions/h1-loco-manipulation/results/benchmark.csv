@@ -1,0 +1,7 @@
+task,name,status,gate
+T04,Door opening — hinge angle,PASS,"door_angle ≥ 1.0 rad (measured from qpos, not commanded)"
+T05,3-finger force-closure grasp,PASS,"HOLDING state, grip_cmd ≥ 0.9 rad"
+T09,Shelf placement success,PASS,place_success = True (measured from bottle-shelf distance)
+T10,Balance — no falls during episode,PASS,fall_count = 0
+T11,Energy conservation < 1%,PASS,std/mean < 1% over 1000 steps
+T12,All 8 FSM states reachable (incl. REORIENT),PASS,all 8 states visited in one episode
